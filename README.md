@@ -1,4 +1,4 @@
-# ClickFix Attack Detection
+# ClickFix Pattern Library
 
 Regex patterns for detecting ClickFix social engineering attacks.
 
