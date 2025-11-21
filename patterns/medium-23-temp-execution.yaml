@@ -1,0 +1,63 @@
+name: medium-23-temp-execution
+severity: medium
+description: >
+  Detects executables running from temporary directories. Common staging location for malware.
+
+pattern: |
+  (?i)([Tt]emp|AppData|Users.{0,2}Public|ProgramData|/tmp|/var/tmp|/dev/shm).*\.(exe|dll|bat|cmd|ps1|vbs|js|scr|com|pif|msi|hta|vbe|sh|elf|so)
+
+malicious:
+  - "C:\\Windows\\Temp\\malware.exe"
+  - "C:\\Temp\\backdoor.dll"
+  - "C:\\Users\\victim\\AppData\\Local\\Temp\\dropper.exe"
+  - "C:\\Users\\Public\\trojan.exe"
+  - "C:\\ProgramData\\ransomware.exe"
+  - "/tmp/exploit.sh"
+  - "/var/tmp/backdoor.elf"
+  - "C:\\Windows\\Temp\\payload.bat"
+  - "C:\\Users\\user\\AppData\\Roaming\\malware.vbs"
+  - "C:\\Temp\\evil.cmd"
+  - "C:\\Users\\Public\\AppData\\Local\\Temp\\evil.exe"
+  - "C:\\Windows\\Temp\\clickfix.cmd"
+  - "C:\\Users\\guest\\AppData\\Local\\Temp\\ransomware.exe"
+  - "C:\\ProgramData\\implant.ps1"
+  - "C:\\Temp\\loader.vbs"
+  - "C:\\Windows\\Temp\\obfuscated.js"
+  - "C:\\Users\\victim\\AppData\\Roaming\\Temp\\trojan.exe"
+  - "C:\\Users\\Public\\Downloads\\dropper.scr"
+  - "C:\\ProgramData\\stager.dll"
+  - "/dev/shm/memory-malware.elf"
+  - "C:\\Windows\\Temp\\encoded.vbe"
+  - "C:\\Temp\\implant.jse"
+  - "C:\\Users\\victim\\AppData\\Local\\Temp\\clickfix.msi"
+  - "C:\\Windows\\Temp\\ransomware.com"
+  - "C:\\Temp\\loader.pif"
+  - "C:\\Users\\Public\\malware.hta"
+  - "/var/tmp/trojan.so"
+
+benign:
+  - "C:\\Program Files\\Application\\program.exe"
+  - "C:\\Windows\\System32\\notepad.exe"
+  - "D:\\Software\\installer.msi"
+  - "C:\\Users\\admin\\Documents\\script.bat"
+  - "E:\\Projects\\build\\output.dll"
+  - "C:\\Program Files (x86)\\Company\\app.exe"
+  - "C:\\Work\\automation.ps1"
+  - "C:\\Scripts\\backup.cmd"
+  - "C:\\Development\\test.vbs"
+  - "C:\\Tools\\utility.js"
+  - "/usr/bin/python"
+  - "/opt/app/application"
+  - "/home/user/scripts/deploy.sh"
+  - "C:\\Windows\\explorer.exe"
+  - "C:\\IT\\Scripts\\maintenance.bat"
+  - "C:\\Admin\\monitoring.ps1"
+  - "/usr/local/bin/tool"
+  - "C:\\Source\\build.cmd"
+  - "C:\\Users\\john\\Desktop\\project\\app.exe"
+  - "D:\\Backup\\archive.msi"
+  - "/etc/init.d/service"
+  - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+  - "C:\\Program Files\\Java\\jdk\\bin\\java.exe"
+  - "/Applications/Software.app/Contents/MacOS/software"
+  - "C:\\Users\\administrator\\Scripts\\update.vbs"

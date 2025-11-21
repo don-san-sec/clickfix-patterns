@@ -1,0 +1,71 @@
+name: high-25-ads-abuse
+severity: high
+description: >
+  Detects Alternate Data Stream operations hiding files. NTFS feature abused for stealth and persistence.
+
+patterns:
+  - name: redirect-to-ads
+    pattern: (?i)(type|echo).*>\s*\S+:\S+\.(exe|dll|ps1|vbs|bat|hta|js)
+    description: Detects redirecting output to ADS
+
+  - name: copy-to-ads
+    pattern: (?i)copy.*\s+\S+:\S+\.(exe|dll|ps1|vbs|bat|hta)
+    description: Detects copying files to ADS
+
+  - name: certutil-decode-ads
+    pattern: (?i)certutil.*-decode.*\s+\S+:\S+\.(exe|dll|ps1|vbs|bat|hta)
+    description: Detects certutil decoding to ADS
+
+  - name: rundll32-ads
+    pattern: (?i)rundll32(\.exe)?.*\S+:\S+\.dll
+    description: Detects rundll32 executing from ADS
+
+  - name: regsvr32-ads
+    pattern: (?i)regsvr32.*\S+:\S+\.dll
+    description: Detects regsvr32 with ADS
+
+  - name: wmic-create-ads
+    pattern: (?i)wmic\s+process\s+call\s+create.*\S+:\S+\.(exe|dll|bat)
+    description: Detects WMIC creating process from ADS
+
+malicious:
+  - "type malware.exe > document.txt:hidden.exe"
+  - 'echo "evil" > file.txt:malware.ps1'
+  - "certutil -decode payload.b64 document.pdf:backdoor.exe"
+  - "wmic process call create document.txt:hidden.exe"
+  - "rundll32.exe document.pdf:trojan.dll,EntryPoint"
+  - "regsvr32 /s /i file.txt:evil.dll"
+  - "copy malware.exe normal.txt:hidden.exe"
+  - "echo payload > readme.txt:backdoor.vbs"
+  - "type evil.dll > document.docx:trojan.dll"
+  - "wmic process call create file.txt:backdoor.exe"
+  - "rundll32 invoice.pdf:evil.dll,Start"
+  - "regsvr32 /s document.txt:malicious.dll"
+  - "certutil -decode encoded.txt image.jpg:payload.exe"
+  - "copy /b backdoor.exe+normal.txt document.pdf:hidden.exe"
+  - "echo malicious > legit.txt:evil.ps1"
+  - "type trojan.dll > readme.doc:backdoor.dll"
+  - "wmic process call create report.xlsx:malware.exe"
+  - "rundll32.exe file.txt:loader.dll,Execute"
+
+benign:
+  - "type file.txt"
+  - "echo Hello World"
+  - "certutil -hashfile file.exe SHA256"
+  - "copy file.txt backup.txt"
+  - "wmic process list brief"
+  - "rundll32.exe shell32.dll,Control_RunDLL"
+  - "regsvr32 legitimate.dll"
+  - "echo %PATH%"
+  - "type C:\\logs\\application.log"
+  - "certutil -verify certificate.cer"
+  - "copy C:\\data\\*.txt D:\\backup\\"
+  - "wmic product get name"
+  - "rundll32 printui.dll,PrintUIEntry"
+  - "regsvr32 /u component.dll"
+  - "echo Installation complete"
+  - "type README.md > output.txt"
+  - "certutil -store My"
+  - "copy /y source.dat destination.dat"
+  - "wmic os get caption"
+  - "rundll32 user32.dll,LockWorkStation"

@@ -1,0 +1,54 @@
+name: experimental-high-17-installutil
+severity: high-experimental
+description: >
+  Detects installutil executing untrusted assemblies. .NET tool abused for code execution bypass.
+  to trigger Uninstall methods that contain malicious code, /logfile= and /LogToConsole=false
+  flags to suppress output and avoid detection, and loading assemblies with suspicious names
+  or from non-standard locations. Legitimate InstallUtil usage involves installing services
+  and components from Program Files or trusted installation directories. The /installtype parameter
+  can specify custom installation behavior. This pattern is experimental because legitimate
+  software installations and .NET deployments may use InstallUtil, requiring allowlisting of
+  known-good assemblies and deployment pipelines. Detection focuses on suspicious paths combined
+  with common evasion flags and unusual file locations.
+
+pattern: |
+  (?i)installutil(?:\.exe)?[\s\r\n]+(?:[^\r\n]*?(?:/U|/uninstall|/logfile=|/LogToConsole=false|/logtoconsole=false)[\s\r\n]+)?[^\r\n]*?(?:C:\\(?:Windows\\Temp|Temp|Users\\[^\\]+\\AppData\\(?:Local\\)?(?:Temp)?|Users\\Public|ProgramData)|/tmp|/var/tmp)[^\r\n]*?\.(?:exe|dll)
+
+malicious:
+  - "InstallUtil.exe C:\\Temp\\malware.exe"
+  - "installutil.exe /U C:\\Windows\\Temp\\backdoor.dll"
+  - "InstallUtil C:\\Users\\victim\\AppData\\Local\\Temp\\evil.exe"
+  - "installutil.exe /logfile= /LogToConsole=false C:\\Temp\\trojan.exe"
+  - "InstallUtil.exe /U C:\\Users\\Public\\clickfix.exe"
+  - "installutil C:\\ProgramData\\implant.dll"
+  - "InstallUtil.exe /uninstall C:\\Windows\\Temp\\ransomware.exe"
+  - "installutil.exe /LogToConsole=false C:\\Temp\\dropper.dll"
+  - "InstallUtil /U /logfile= C:\\Users\\victim\\AppData\\Local\\Temp\\stage2.exe"
+  - "installutil.exe C:\\Users\\Public\\Documents\\malicious.exe"
+  - "InstallUtil.exe /logtoconsole=false C:\\Windows\\Temp\\loader.dll"
+  - "installutil /U C:\\ProgramData\\backdoor.exe"
+  - "InstallUtil.exe C:\\Users\\guest\\AppData\\Local\\Temp\\trojan.dll"
+  - "installutil.exe /logfile= C:\\Temp\\persistence.exe"
+  - "InstallUtil /uninstall /LogToConsole=false C:\\Windows\\Temp\\obfuscated.dll"
+  - "installutil.exe C:\\Users\\Public\\Downloads\\malware.exe"
+  - "InstallUtil.exe /U /logtoconsole=false C:\\ProgramData\\evil.dll"
+  - "cmd /c installutil.exe C:\\Temp\\clickfix-installer.exe"
+  - "InstallUtil C:\\Users\\victim\\AppData\\Roaming\\implant.exe"
+  - "installutil.exe /logfile= /U C:\\Windows\\Temp\\stager.dll"
+
+benign:
+  - "InstallUtil.exe C:\\Program Files\\MyApp\\component.dll"
+  - "installutil /i C:\\Applications\\service.exe"
+  - "InstallUtil.exe C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\MyService.exe"
+  - "installutil.exe C:\\Program Files (x86)\\Company\\Service.exe"
+  - "InstallUtil /U C:\\Program Files\\Application\\uninstall.dll"
+  - "installutil C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\ServiceHost.exe"
+  - "InstallUtil.exe C:\\Deploy\\Services\\BackgroundWorker.dll"
+  - "installutil.exe /i C:\\Software\\Installer\\Component.exe"
+  - "InstallUtil C:\\Program Files\\Common Files\\Service.dll"
+  - "installutil.exe C:\\Windows\\System32\\CustomService.exe"
+  - "InstallUtil.exe /installtype=notransaction C:\\Program Files\\MyApp\\service.dll"
+  - "installutil /LogToConsole=true C:\\Program Files\\Application\\installer.exe"
+  - "InstallUtil.exe C:\\Development\\bin\\Release\\Service.dll"
+  - "installutil C:\\Projects\\MyService\\bin\\Debug\\MyService.exe"
+  - "InstallUtil.exe /i C:\\Enterprise\\Services\\Worker.dll"

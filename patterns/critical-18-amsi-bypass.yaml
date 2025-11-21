@@ -1,0 +1,35 @@
+name: critical-18-amsi-bypass
+severity: critical
+description: >
+  Detects AMSI bypass attempts. Critical indicator of evasion techniques.
+
+pattern: |
+  (?i)(AmsiUtils|amsiInitFailed|amsiContext).*(SetValue|bypass|NonPublic|=\s*\$true)|Ref.*Assembly.*GetType.*AmsiUtils
+
+malicious:
+  - "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)"
+  - '$amsi = [Ref].Assembly.GetType("System.Management.Automation.AmsiUtils")'
+  - "[Runtime.InteropServices.Marshal]::WriteInt32([Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiContext')"
+  - 'powershell -c "$x=[Ref].Assembly.GetType(''System.Management.Automation.AmsiUtils'');$x.GetField(''amsiInitFailed'',''NonPublic,Static'').SetValue($null,$true)"'
+  - "$a=[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils');$a.GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)"
+  - "[System.Management.Automation.AmsiUtils]::amsiInitFailed = $true"
+  - "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils')"
+  - "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiSession','NonPublic,Static').SetValue($null,$null)"
+  - "[System.Management.Automation.AmsiUtils].GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)"
+  - "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('s_amsiContext','NonPublic,Static').SetValue($null,[IntPtr]::Zero)"
+
+benign:
+  - 'Get-Process | Where-Object Name -like "powershell"'
+  - "[Reflection.Assembly]::LoadFile(\"C:\\MyApp\\library.dll\")"
+  - "Get-Command -Module ActiveDirectory"
+  - '[System.IO.File]::ReadAllText("config.xml")'
+  - "Get-WmiObject Win32_Process"
+  - '$assembly = [Reflection.Assembly]::LoadFrom("MyModule.dll")'
+  - "Get-EventLog -LogName Application"
+  - "Test-Path C:\\Windows\\System32"
+  - "[System.Environment]::GetFolderPath('ApplicationData')"
+  - "[Reflection.Assembly]::GetExecutingAssembly()"
+  - "$type = [System.Management.Automation.PSObject]"
+  - "[System.Management.Automation.Runspaces.Runspace]::DefaultRunspace"
+  - "Get-Module -ListAvailable"
+  - "$assembly = [Reflection.Assembly]::Load('System.Windows.Forms')"
