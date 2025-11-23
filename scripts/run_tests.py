@@ -265,9 +265,6 @@ def main():
 
     result = TestResult()
 
-    # Check for --all flag
-    include_experimental = "--all" in sys.argv
-
     # Check if specific pattern requested
     if len(sys.argv) > 1 and not sys.argv[1].startswith("--"):
         pattern_arg = sys.argv[1]
@@ -287,25 +284,13 @@ def main():
         test_pattern(yaml_file, result)
     else:
         # Test all patterns
-        if include_experimental:
-            print(f"{BLUE}Testing all patterns (including experimental)...{NC}")
-            print()
-            yaml_files = (
-                sorted(patterns_dir.glob("critical-*.yaml"))
-                + sorted(patterns_dir.glob("high-*.yaml"))
-                + sorted(patterns_dir.glob("medium-*.yaml"))
-                + sorted(patterns_dir.glob("experimental-*.yaml"))
-            )
-        else:
-            print(f"{BLUE}Testing all patterns (excluding experimental)...{NC}")
-            print()
-            yaml_files = (
-                sorted(patterns_dir.glob("critical-*.yaml"))
-                + sorted(patterns_dir.glob("high-*.yaml"))
-                + sorted(patterns_dir.glob("medium-*.yaml"))
-            )
-            # Filter out experimental patterns
-            yaml_files = [f for f in yaml_files if "experimental" not in f.name]
+        print(f"{BLUE}Testing all patterns...{NC}")
+        print()
+        yaml_files = (
+            sorted(patterns_dir.glob("critical-*.yaml"))
+            + sorted(patterns_dir.glob("high-*.yaml"))
+            + sorted(patterns_dir.glob("medium-*.yaml"))
+        )
 
         result.total_patterns = len(yaml_files)
 
@@ -371,23 +356,12 @@ if __name__ == "__main__":
         print("ClickFix Pattern Test Runner")
         print()
         print("Usage:")
-        print(
-            "  ./run_tests.py              # Run all pattern tests (excludes experimental)"
-        )
-        print("  ./run_tests.py --all        # Run ALL tests including experimental")
+        print("  ./run_tests.py              # Run all pattern tests")
         print("  ./run_tests.py PATTERN      # Run specific pattern file")
         print()
         print("Examples:")
         print("  ./run_tests.py                          # Test all patterns")
-        print(
-            "  ./run_tests.py --all                    # Test all including experimental"
-        )
         print("  ./run_tests.py critical-01-base64-powershell")
-        print("  ./run_tests.py experimental-high-05-download-commands")
-        print()
-        print(
-            "Note: Experimental patterns require allowlists and are skipped by default."
-        )
         print()
         sys.exit(0)
 

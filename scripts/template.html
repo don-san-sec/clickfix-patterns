@@ -4,6 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>ClickFix Detection Patterns</title>
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+            rel="stylesheet"
+        />
         <style>
             * {
                 margin: 0;
@@ -15,7 +19,6 @@
                 --critical: #dc3545;
                 --high: #fd7e14;
                 --medium: #ffc107;
-                --experimental: #6f42c1;
                 --text-primary: #1a1a1a;
                 --text-secondary: #666;
                 --bg-primary: #ffffff;
@@ -100,10 +103,6 @@
             }
 
             .toc {
-                background: var(--bg-secondary);
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                padding: 1rem;
                 position: sticky;
                 top: 1rem;
                 max-height: calc(100vh - 2rem);
@@ -114,7 +113,7 @@
                 font-size: 0.75rem;
                 text-transform: uppercase;
                 color: var(--text-secondary);
-                margin-bottom: 0.75rem;
+                margin-bottom: 0.5rem;
                 font-weight: 600;
                 letter-spacing: 0.5px;
             }
@@ -124,20 +123,11 @@
             }
 
             .toc li {
-                margin-bottom: 0;
-            }
-
-            .toc li.section {
-                margin-top: 0.75rem;
-                margin-bottom: 0.25rem;
-            }
-
-            .toc li.pattern {
-                padding-left: 1rem;
+                margin-bottom: 0.125rem;
             }
 
             .toc a {
-                color: var(--text-primary);
+                color: var(--text-secondary);
                 text-decoration: none;
                 font-size: 0.8125rem;
                 display: block;
@@ -146,32 +136,22 @@
             }
 
             .toc a:hover {
-                color: var(--critical);
+                color: var(--text-primary);
             }
 
-            .toc a.section-link {
-                font-weight: 600;
+            .toc a.critical {
+                border-left: 2px solid var(--critical);
+                padding-left: 0.5rem;
             }
 
-            .toc .severity-indicator {
-                display: inline-block;
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                margin-right: 0.375rem;
+            .toc a.high {
+                border-left: 2px solid var(--high);
+                padding-left: 0.5rem;
             }
 
-            .toc .critical {
-                background: var(--critical);
-            }
-            .toc .high {
-                background: var(--high);
-            }
-            .toc .medium {
-                background: var(--medium);
-            }
-            .toc .experimental {
-                background: var(--experimental);
+            .toc a.medium {
+                border-left: 2px solid var(--medium);
+                padding-left: 0.5rem;
             }
 
             .content {
@@ -189,19 +169,6 @@
 
             h2:first-child {
                 margin-top: 0;
-            }
-
-            h2.critical {
-                border-bottom-color: var(--critical);
-            }
-            h2.high {
-                border-bottom-color: var(--high);
-            }
-            h2.medium {
-                border-bottom-color: var(--medium);
-            }
-            h2.experimental {
-                border-bottom-color: var(--experimental);
             }
 
             .pattern {
@@ -222,9 +189,6 @@
             }
             .pattern.medium {
                 border-left-color: var(--medium);
-            }
-            .pattern.experimental {
-                border-left-color: var(--experimental);
             }
 
             .pattern-header {
@@ -263,9 +227,6 @@
             .severity-badge.medium {
                 background: var(--medium);
             }
-            .severity-badge.experimental {
-                background: var(--experimental);
-            }
 
             .pattern-description {
                 color: var(--text-secondary);
@@ -274,22 +235,65 @@
                 font-size: 0.875rem;
             }
 
-            .detection-intent {
-                background: var(--bg-secondary);
-                border-left: 2px solid var(--text-secondary);
-                padding: 0.5rem 0.75rem;
+            .examples-section {
                 margin-bottom: 0.75rem;
-                border-radius: 3px;
-                font-size: 0.8125rem;
             }
 
-            .detection-intent strong {
+            .examples-toggle {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                padding: 0.5rem 0.75rem;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 0.8125rem;
                 color: var(--text-primary);
-                margin-right: 0.25rem;
-                font-size: 0.6875rem;
-                text-transform: uppercase;
-                letter-spacing: 0.3px;
-                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                user-select: none;
+            }
+
+            .examples-toggle:hover {
+                background: #f0f0f0;
+            }
+
+            .examples-toggle .arrow {
+                transition: transform 0.2s;
+                font-size: 0.75rem;
+            }
+
+            .examples-toggle.open .arrow {
+                transform: rotate(90deg);
+            }
+
+            .examples-content {
+                display: none;
+                margin-top: 0.5rem;
+                padding: 0.75rem;
+                background: var(--bg-secondary);
+                border-radius: 3px;
+                border: 1px solid var(--border);
+            }
+
+            .examples-content.open {
+                display: block;
+            }
+
+            .examples-content pre {
+                margin: 0.25rem 0;
+                padding: 0.5rem;
+                background: #fff;
+                border-radius: 3px;
+                font-family: "SF Mono", "Monaco", "Consolas", monospace;
+                font-size: 0.75rem;
+                overflow-x: auto;
+                white-space: pre-wrap;
+                word-break: break-all;
+                border: 1px solid var(--border);
+            }
+
+            .examples-content pre:first-child {
+                margin-top: 0;
             }
 
             .regex-container {
@@ -297,19 +301,26 @@
             }
 
             .pattern-regex {
-                background: var(--code-bg);
-                color: var(--text-primary);
                 padding: 0.75rem;
                 padding-right: 4rem;
                 border-radius: 3px;
-                font-family: "SF Mono", "Monaco", "Consolas", monospace;
                 font-size: 0.8125rem;
                 overflow-x: auto;
-                white-space: pre-wrap;
-                word-break: break-all;
                 line-height: 1.4;
                 margin: 0;
-                border: 1px solid var(--border);
+            }
+
+            pre[class*="language-"] {
+                margin: 0;
+                padding: 0.75rem;
+                padding-right: 4rem;
+                border-radius: 3px;
+                font-size: 0.8125rem;
+            }
+
+            code[class*="language-"] {
+                font-family: "SF Mono", "Monaco", "Consolas", monospace;
+                font-size: 0.8125rem;
             }
 
             .copy-btn {
@@ -335,6 +346,39 @@
 
             .copy-btn.copied {
                 background: #28a745;
+            }
+
+            .regex-actions {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+                align-items: center;
+            }
+
+            .regex101-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.25rem;
+                padding: 0.25rem 0.75rem;
+                background: #f0f0f0;
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                color: var(--text-primary);
+                text-decoration: none;
+                font-size: 0.6875rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                transition: all 0.2s;
+            }
+
+            .regex101-link:hover {
+                background: #e0e0e0;
+            }
+
+            .regex101-link svg {
+                width: 12px;
+                height: 12px;
             }
 
             footer {
@@ -391,31 +435,23 @@
                 <p class="subtitle">
                     Detection patterns for ClickFix social engineering attacks
                 </p>
-                <div class="stats">
-                    {{ total_count }} patterns · {{ stable_count }} stable · {{
-                    experimental_count }} experimental
-                </div>
             </div>
         </div>
 
         <div class="container">
             <div class="layout">
                 <aside class="toc">
-                    <h3>Table of Contents</h3>
+                    <h3>Patterns</h3>
                     <ul>
                         {% for severity_key, severity_data in severities %} {%
-                        if severity_data.patterns %}
-                        <li class="section">
-                            <a href="#{{ severity_key }}" class="section-link">
-                                <span
-                                    class="severity-indicator {{ severity_key }}"
-                                ></span
-                                >{{ severity_data.label }}
-                            </a>
-                        </li>
-                        {% for pattern in severity_data.patterns %}
-                        <li class="pattern">
-                            <a href="#{{ pattern.id }}">{{ pattern.name }}</a>
+                        if severity_data.patterns %} {% for pattern in
+                        severity_data.patterns %}
+                        <li>
+                            <a
+                                href="#{{ pattern.id }}"
+                                class="{{ severity_key }}"
+                                >{{ pattern.name }}</a
+                            >
                         </li>
                         {% endfor %} {% endif %} {% endfor %}
                     </ul>
@@ -423,12 +459,8 @@
 
                 <main class="content">
                     {% for severity_key, severity_data in severities %} {% if
+                    severity_data.patterns %} {% for pattern in
                     severity_data.patterns %}
-                    <h2 id="{{ severity_key }}" class="{{ severity_key }}">
-                        {{ severity_data.label }}
-                    </h2>
-
-                    {% for pattern in severity_data.patterns %}
                     <div
                         class="pattern {{ severity_key }}"
                         id="{{ pattern.id }}"
@@ -443,20 +475,62 @@
                             {{ pattern.description }}
                         </div>
 
-                        {% if pattern.intent %}
-                        <div class="detection-intent">
-                            <strong>Detects</strong>
-                            {{ pattern.intent }}
+                        {% if pattern.malicious_examples %}
+                        <div class="examples-section">
+                            <div
+                                class="examples-toggle"
+                                onclick="toggleExamples(this)"
+                            >
+                                <span class="arrow">▶</span>
+                                <span>View malicious examples</span>
+                            </div>
+                            <div class="examples-content">
+                                {% for example in pattern.malicious_examples %}
+                                <pre>{{ example }}</pre>
+                                {% endfor %}
+                            </div>
                         </div>
                         {% endif %} {% if pattern.regex %}
                         <div class="regex-container">
+                            <div class="regex-actions">
+                                <a
+                                    href="https://regex101.com/?regex={{ pattern.regex|urlencode }}&flags=gmi"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="regex101-link"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path
+                                            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                                        ></path>
+                                        <polyline
+                                            points="15 3 21 3 21 9"
+                                        ></polyline>
+                                        <line
+                                            x1="10"
+                                            y1="14"
+                                            x2="21"
+                                            y2="3"
+                                        ></line>
+                                    </svg>
+                                    Test on Regex101
+                                </a>
+                            </div>
                             <button
                                 class="copy-btn"
                                 onclick="copyToClipboard(this, {{ pattern.regex|tojson }})"
                             >
                                 Copy
                             </button>
-                            <pre class="pattern-regex">{{ pattern.regex }}</pre>
+                            <pre><code class="language-regex">{{ pattern.regex }}</code></pre>
                         </div>
                         {% endif %}
                     </div>
@@ -475,6 +549,9 @@
                 >
             </p>
         </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-regex.min.js"></script>
 
         <button
             class="scroll-top"
@@ -500,6 +577,12 @@
                     .catch((err) => {
                         console.error("Failed to copy:", err);
                     });
+            }
+
+            function toggleExamples(element) {
+                element.classList.toggle("open");
+                const content = element.nextElementSibling;
+                content.classList.toggle("open");
             }
 
             // Scroll to top button

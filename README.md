@@ -9,8 +9,7 @@ ClickFix is a social engineering attack that tricks users into copying and execu
 ## Quick Start
 
 ```bash
-make test       # Run stable pattern tests (100% pass rate)
-make test-all   # Run all tests including experimental patterns
+make test       # Run pattern tests
 ```
 
 ## Documentation
@@ -23,8 +22,7 @@ View the **[Pattern Documentation](https://don-san-sec.github.io/clickfix-patter
 patterns/                           # Pattern definitions (YAML only)
 ├── critical-XX-name.yaml           # Tier 1: Critical risk patterns
 ├── high-XX-name.yaml               # Tier 2: High risk patterns
-├── medium-XX-name.yaml             # Tier 3: Medium risk patterns
-└── experimental-*-XX-name.yaml     # Patterns requiring allowlists
+└── medium-XX-name.yaml             # Tier 3: Medium risk patterns
 
 scripts/                            # Tools
 ├── run_tests.py                    # Pattern testing

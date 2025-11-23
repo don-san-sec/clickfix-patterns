@@ -3,6 +3,8 @@
 Generate HTML pattern documentation from YAML files for GitHub Pages
 """
 
+import re
+import urllib.parse
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -19,6 +21,8 @@ def parse_yaml_pattern(yaml_file: Path) -> Dict:
         "description": "",
         "pattern": "",
         "patterns": [],
+        "malicious": [],
+        "benign": [],
     }
 
     lines = content.splitlines()
@@ -26,6 +30,7 @@ def parse_yaml_pattern(yaml_file: Path) -> Dict:
     multiline_value = []
     current_pattern = None
     in_patterns_list = False
+    in_test_list = False
 
     for line in lines:
         stripped = line.strip()
@@ -46,7 +51,24 @@ def parse_yaml_pattern(yaml_file: Path) -> Dict:
                 elif current_section == "description":
                     pattern_data[current_section] = " ".join(multiline_value).strip()
                 multiline_value = []
-            current_section = None
+            current_section = stripped[:-1]  # Remove the colon
+            in_test_list = True
+            in_patterns_list = False
+            continue
+
+        # Handle list items in test sections (malicious/benign)
+        if (
+            stripped.startswith("- ")
+            and in_test_list
+            and current_section in ["malicious", "benign"]
+        ):
+            item = stripped[2:].strip()
+            # Remove quotes if present
+            if item.startswith('"') and item.endswith('"'):
+                item = item[1:-1]
+            elif item.startswith("'") and item.endswith("'"):
+                item = item[1:-1]
+            pattern_data[current_section].append(item)
             continue
 
         # Handle list items in patterns
@@ -61,6 +83,7 @@ def parse_yaml_pattern(yaml_file: Path) -> Dict:
                     "description": "",
                 }
                 in_patterns_list = True
+                in_test_list = False
             continue
 
         # Handle key-value pairs
@@ -85,6 +108,7 @@ def parse_yaml_pattern(yaml_file: Path) -> Dict:
                 pattern_data[key] = value
                 current_section = None
                 in_patterns_list = False
+                in_test_list = False
             elif key in ["description", "pattern"]:
                 current_section = key
                 if value and value not in ["|", ">"]:
@@ -150,25 +174,27 @@ def generate_pattern_id(name: str) -> str:
     return name.replace("_", "-").replace(" ", "-").lower()
 
 
+def extract_malicious_examples(pattern_data: Dict) -> List[str]:
+    """Extract malicious test cases from pattern data."""
+    if "malicious" in pattern_data and pattern_data["malicious"]:
+        # Return first 5 examples
+        return pattern_data["malicious"][:5]
+    return []
+
+
 def load_patterns(patterns_dir: Path) -> Dict[str, List[Tuple]]:
     """Load all pattern files and organize by severity."""
     patterns_by_severity = {
         "critical": [],
         "high": [],
         "medium": [],
-        "experimental": [],
     }
 
     for yaml_file in sorted(patterns_dir.glob("*.yaml")):
         pattern_data = parse_yaml_pattern(yaml_file)
-
-        # Categorize by severity
-        if "experimental" in yaml_file.name:
-            patterns_by_severity["experimental"].append((yaml_file, pattern_data))
-        else:
-            severity = pattern_data["severity"]
-            if severity in patterns_by_severity:
-                patterns_by_severity[severity].append((yaml_file, pattern_data))
+        severity = pattern_data["severity"]
+        if severity in patterns_by_severity:
+            patterns_by_severity[severity].append((yaml_file, pattern_data))
 
     return patterns_by_severity
 
@@ -176,20 +202,17 @@ def load_patterns(patterns_dir: Path) -> Dict[str, List[Tuple]]:
 def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
     """Prepare data for Jinja2 template."""
     # Calculate counts
-    stable_count = (
+    total_count = (
         len(patterns_by_severity["critical"])
         + len(patterns_by_severity["high"])
         + len(patterns_by_severity["medium"])
     )
-    experimental_count = len(patterns_by_severity["experimental"])
-    total_count = stable_count + experimental_count
 
     # Severity configuration
     severity_configs = [
-        ("critical", "🔴 Critical Severity", "Critical"),
-        ("high", "🟠 High Severity", "High"),
-        ("medium", "🟡 Medium Severity", "Medium"),
-        ("experimental", "🟣 Experimental Patterns", "Experimental"),
+        ("critical", "Critical", "Critical"),
+        ("high", "High", "High"),
+        ("medium", "Medium", "Medium"),
     ]
 
     # Build severities data
@@ -197,13 +220,15 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
     for severity_key, severity_label, severity_badge in severity_configs:
         patterns = []
         for yaml_file, data in patterns_by_severity[severity_key]:
+            regex_pattern = data["pattern"]
             patterns.append(
                 {
                     "id": generate_pattern_id(data["name"]),
                     "name": data["name"],
                     "description": data["description"],
                     "intent": get_detection_intent(data["name"], data["description"]),
-                    "regex": data["pattern"],
+                    "regex": regex_pattern,
+                    "malicious_examples": extract_malicious_examples(data),
                 }
             )
 
@@ -220,8 +245,6 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
 
     return {
         "total_count": total_count,
-        "stable_count": stable_count,
-        "experimental_count": experimental_count,
         "severities": severities,
     }
 
@@ -239,6 +262,7 @@ def generate_html_documentation(output_dir: Path):
 
     # Setup Jinja2
     env = Environment(loader=FileSystemLoader(scripts_dir))
+    env.filters["urlencode"] = urllib.parse.quote_plus
     template = env.get_template("template.html")
 
     # Render template
