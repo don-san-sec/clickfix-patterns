@@ -2,59 +2,76 @@
 
 Regex patterns for detecting ClickFix social engineering attacks.
 
+![ClickFix Pattern Library](.github/media/banner.png)
+
+---
+
 ## What is ClickFix?
 
-ClickFix is a social engineering attack that tricks users into copying and executing malicious commands. This project provides regex patterns to detect such attacks.
+ClickFix is a social engineering technique that tricks users into copying and executing malicious commands. Attackers disguise PowerShell, bash, or other scripts as "fixes" for fake errors. This library provides detection patterns to identify these attacks.
+
+## Quick Links
+
+- **[Live Documentation](https://don-san-sec.github.io/clickfix-patterns/)** - Interactive pattern browser with testing tool
+- **[GitHub Repository](https://github.com/don-san-sec/clickfix-patterns)** - Source code and patterns
 
 ## Quick Start
 
 ```bash
-make setup      # Install dependencies (first time only)
+make setup      # Install dependencies
 make test       # Run pattern tests
 make docs       # Generate documentation
 ```
 
-## Documentation
-
-View the **[Pattern Documentation](https://don-san-sec.github.io/clickfix-patterns/)** on GitHub Pages for complete pattern details with descriptions, regex patterns, and severity levels. Auto-updated on every commit.
-
-The documentation includes an **interactive Pattern Tester** - click "🧪 Test String" in the header to test strings against all patterns instantly.
-
-## Structure
+## Pattern Structure
 
 ```
-patterns/                           # Pattern definitions (YAML only)
-├── critical-XX-name.yaml           # Tier 1: Critical risk patterns
-├── high-XX-name.yaml               # Tier 2: High risk patterns
-└── medium-XX-name.yaml             # Tier 3: Medium risk patterns
-
-scripts/                            # Tools
-├── run_tests.py                    # Pattern testing
-└── generate_docs.py                # Documentation generation
+patterns/
+├── critical-01-base64-powershell.yaml
+├── critical-02-hidden-powershell.yaml
+├── high-01-encoded-commands.yaml
+├── high-02-iex-download.yaml
+└── medium-01-suspicious-patterns.yaml
 ```
 
-Each pattern is a YAML file containing:
-- `name` - Pattern identifier
-- `severity` - Risk level (critical, high, medium)
-- `description` - What the pattern detects and why
-- `pattern` - The regex pattern (or `patterns` for multiple sub-patterns)
-- `malicious` - Commands that should be blocked (test cases)
-- `benign` - Commands that should be allowed (test cases)
+Each YAML pattern contains:
+- **name** - Pattern identifier
+- **severity** - Risk level (critical/high/medium)
+- **description** - Detection intent
+- **pattern** - Regex pattern(s)
+- **malicious** - Test cases that should match
+- **benign** - Test cases that should not match
 
-## Pattern Tester
+## Interactive Tester
 
-The [hosted documentation](https://don-san-sec.github.io/clickfix-patterns/) includes an interactive **Pattern Tester**:
+The [live documentation](https://don-san-sec.github.io/clickfix-patterns/) includes an interactive pattern tester:
 
-1. Click "🧪 Test String" button in the header
-2. Enter any string or command to test
-3. Click "Test String" to see which patterns match
-4. Toggle back to "📋 Show Patterns" to view the pattern list
+1. Click **🧪 Test String** in the header
+2. Paste any command or string
+3. See which patterns match instantly
+4. Click pattern names to view details
 
-Perfect for:
-- Finding false positives in legitimate commands
-- Testing new patterns before deployment
-- Debugging pattern behavior
+Perfect for validating patterns against real-world commands and identifying false positives.
+
+## Development
+
+```bash
+# Test specific pattern
+./scripts/run_tests.py critical-01-base64-powershell
+
+# Test all patterns
+./scripts/run_tests.py
+
+# Generate documentation
+./scripts/generate_docs.py
+```
+
+## Pattern Tiers
+
+- **Critical** - Immediate threat indicators (encoded PowerShell, hidden execution)
+- **High** - Strong malicious signals (remote downloads, script execution)
+- **Medium** - Suspicious patterns requiring context
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License - See [LICENSE](LICENSE) for details.

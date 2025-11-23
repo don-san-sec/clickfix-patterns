@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""
-ClickFix Pattern Test Runner
-Tests regex patterns against known good/bad commands
-"""
+"""ClickFix Pattern Test Runner."""
 
 import os
 import re
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+from yaml_parser import parse_yaml_pattern
 
 # ANSI color codes
 RED = "\033[0;31m"
@@ -31,130 +30,12 @@ class TestResult:
         self.failures = []
 
 
-def parse_yaml_pattern(yaml_file: Path) -> Dict:
-    """Parse a simple YAML pattern file. No external dependencies.
-    Supports both single pattern and multiple patterns format."""
-    content = yaml_file.read_text()
-
-    pattern_data = {
-        "name": "",
-        "severity": "",
-        "description": "",
-        "pattern": "",
-        "patterns": [],  # Support for multiple patterns
-        "malicious": [],
-        "benign": [],
-    }
-
-    lines = content.splitlines()
-    current_section = None
-    multiline_value = []
-    current_pattern = None
-    in_patterns_list = False
-
-    for line in lines:
-        stripped = line.strip()
-
-        # Skip empty lines
-        if not stripped:
-            continue
-
-        # Handle list items
-        if stripped.startswith("- "):
-            item = stripped[2:].strip()
-
-            # Check if this is a pattern definition in patterns list
-            if current_section == "patterns":
-                # Start of a new pattern object
-                if item.startswith("name:"):
-                    if current_pattern:
-                        pattern_data["patterns"].append(current_pattern)
-                    current_pattern = {
-                        "name": item[5:].strip(),
-                        "pattern": "",
-                        "description": "",
-                    }
-                    in_patterns_list = True
-                continue
-
-            # Remove quotes if present for test cases
-            if item.startswith('"') and item.endswith('"'):
-                item = item[1:-1].replace('\\"', '"')
-
-            if current_section == "malicious":
-                pattern_data["malicious"].append(item)
-            elif current_section == "benign":
-                pattern_data["benign"].append(item)
-            continue
-
-        # Handle key-value pairs
-        if ":" in line and not line.startswith("  "):
-            # Save previous multiline value
-            if multiline_value and current_section:
-                if current_section == "pattern" and not in_patterns_list:
-                    pattern_data[current_section] = "\n".join(multiline_value).strip()
-                multiline_value = []
-
-            key, _, value = line.partition(":")
-            key = key.strip()
-            value = value.strip()
-
-            if key in ["name", "severity"]:
-                pattern_data[key] = value
-                current_section = None
-                in_patterns_list = False
-            elif key in ["description", "pattern"]:
-                current_section = key
-                if value and value != "|" and value != ">":
-                    multiline_value = [value]
-            elif key == "patterns":
-                current_section = key
-                in_patterns_list = True
-            elif key in ["malicious", "benign"]:
-                current_section = key
-                in_patterns_list = False
-        # Handle indented content for patterns list
-        elif line.startswith("  ") and in_patterns_list and current_pattern:
-            key_val = line.strip()
-            if ":" in key_val:
-                key, _, value = key_val.partition(":")
-                key = key.strip()
-                value = value.strip()
-                if key == "pattern":
-                    current_pattern["pattern"] = value
-                elif key == "description":
-                    current_pattern["description"] = value
-        # Handle multiline content
-        elif (
-            current_section in ["description", "pattern"]
-            and line.startswith(" ")
-            and not in_patterns_list
-        ):
-            multiline_value.append(line.strip())
-
-    # Save last multiline value
-    if multiline_value and current_section:
-        pattern_data[current_section] = "\n".join(multiline_value).strip()
-
-    # Save last pattern in patterns list
-    if current_pattern:
-        pattern_data["patterns"].append(current_pattern)
-
-    return pattern_data
-
-
 def test_command(pattern: re.Pattern, command: str, should_match: bool) -> bool:
-    """Test a single command against a pattern."""
     matches = pattern.search(command) is not None
-
-    if should_match:
-        return matches  # True positive if matches, False negative if not
-    else:
-        return not matches  # True negative if doesn't match, False positive if matches
+    return matches if should_match else not matches
 
 
 def test_pattern(yaml_file: Path, result: TestResult) -> bool:
-    """Test a single pattern from YAML file."""
     pattern_name = yaml_file.stem
 
     try:
@@ -163,10 +44,8 @@ def test_pattern(yaml_file: Path, result: TestResult) -> bool:
         print(f"{RED}✗{NC} {pattern_name}: Failed to parse YAML: {e}")
         return False
 
-    # Get pattern(s) - support both single pattern and multiple patterns
     patterns = []
     if pattern_data.get("patterns"):
-        # Multiple patterns format
         for p in pattern_data["patterns"]:
             try:
                 compiled = re.compile(p["pattern"], re.IGNORECASE | re.DOTALL)
@@ -175,7 +54,6 @@ def test_pattern(yaml_file: Path, result: TestResult) -> bool:
                 print(f"{RED}✗{NC} {pattern_name} ({p['name']}): Invalid regex: {e}")
                 return False
     elif pattern_data.get("pattern"):
-        # Single pattern format
         try:
             compiled = re.compile(pattern_data["pattern"], re.IGNORECASE | re.DOTALL)
             patterns.append(compiled)
@@ -193,7 +71,6 @@ def test_pattern(yaml_file: Path, result: TestResult) -> bool:
     malicious_failed = 0
     benign_failed = 0
 
-    # Test malicious commands (should match)
     for line in pattern_data["malicious"]:
         if not line.strip():
             continue
@@ -201,7 +78,6 @@ def test_pattern(yaml_file: Path, result: TestResult) -> bool:
         malicious_count += 1
         result.total_tests += 1
 
-        # Test against all patterns - any match is a pass
         matched = any(test_command(p, line, True) for p in patterns)
         if matched:
             malicious_passed += 1
@@ -213,7 +89,6 @@ def test_pattern(yaml_file: Path, result: TestResult) -> bool:
                 f"{RED}✗{NC} {pattern_name}: FALSE NEGATIVE - Should block: {YELLOW}{line[:80]}{NC}"
             )
 
-    # Test benign commands (should NOT match)
     for line in pattern_data["benign"]:
         if not line.strip():
             continue
@@ -221,7 +96,6 @@ def test_pattern(yaml_file: Path, result: TestResult) -> bool:
         benign_count += 1
         result.total_tests += 1
 
-        # Test against all patterns - no match is a pass
         matched = any(test_command(p, line, True) for p in patterns)
         if not matched:
             benign_passed += 1
@@ -233,7 +107,6 @@ def test_pattern(yaml_file: Path, result: TestResult) -> bool:
                 f"{RED}✗{NC} {pattern_name}: FALSE POSITIVE - Should allow: {YELLOW}{line[:80]}{NC}"
             )
 
-    # Calculate results
     total_pattern_tests = malicious_count + benign_count
     passed_pattern_tests = malicious_passed + benign_passed
     failed_pattern_tests = malicious_failed + benign_failed
@@ -260,16 +133,13 @@ def main():
     print(f"{BOLD}{CYAN}{'━' * 60}{NC}")
     print()
 
-    # Get patterns directory
     patterns_dir = Path(__file__).parent.parent / "patterns"
 
     result = TestResult()
 
-    # Check if specific pattern requested
     if len(sys.argv) > 1 and not sys.argv[1].startswith("--"):
         pattern_arg = sys.argv[1]
 
-        # Add .yaml extension if not present
         if not pattern_arg.endswith(".yaml"):
             pattern_arg = pattern_arg + ".yaml"
 
@@ -283,7 +153,6 @@ def main():
         print()
         test_pattern(yaml_file, result)
     else:
-        # Test all patterns
         print(f"{BLUE}Testing all patterns...{NC}")
         print()
         yaml_files = (
@@ -297,14 +166,12 @@ def main():
         for yaml_file in yaml_files:
             test_pattern(yaml_file, result)
 
-    # Print summary
     print()
     print(f"{BOLD}{CYAN}{'━' * 60}{NC}")
     print(f"{BOLD}{CYAN}  Test Summary{NC}")
     print(f"{BOLD}{CYAN}{'━' * 60}{NC}")
     print()
 
-    # Pattern summary
     if result.failed_patterns == 0:
         print(
             f"{GREEN}✓{NC} Patterns: {GREEN}{BOLD}{result.passed_patterns}{NC}/{result.total_patterns} passed"
@@ -315,7 +182,6 @@ def main():
             f"{RED}{BOLD}{result.failed_patterns} failed{NC}/{result.total_patterns} total"
         )
 
-    # Test summary
     if result.failed_tests == 0:
         print(
             f"{GREEN}✓{NC} Tests:    {GREEN}{BOLD}{result.passed_tests}{NC}/{result.total_tests} passed"
@@ -326,12 +192,10 @@ def main():
             f"{RED}{BOLD}{result.failed_tests} failed{NC}/{result.total_tests} total"
         )
 
-    # Calculate percentages
     if result.total_tests > 0:
         pass_percent = (result.passed_tests * 100) // result.total_tests
         print(f"   Success Rate: {BOLD}{pass_percent}%{NC}")
 
-    # Print failed test details if any
     if result.failures:
         print()
         print(f"{BOLD}{RED}Failed Test Details:{NC}")
@@ -342,7 +206,6 @@ def main():
     print()
     print(f"{BOLD}{CYAN}{'━' * 60}{NC}")
 
-    # Exit with appropriate code
     if result.failed_tests == 0 and result.total_tests > 0:
         print(f"{GREEN}{BOLD}All tests passed!{NC}")
         sys.exit(0)

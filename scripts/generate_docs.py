@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Generate HTML pattern documentation from YAML files for GitHub Pages
-"""
+"""Generate HTML pattern documentation from YAML files for GitHub Pages."""
 
 import re
 import urllib.parse
@@ -9,152 +7,10 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 from jinja2 import Environment, FileSystemLoader
-
-
-def parse_yaml_pattern(yaml_file: Path) -> Dict:
-    """Parse a YAML pattern file without external dependencies."""
-    content = yaml_file.read_text()
-
-    pattern_data = {
-        "name": "",
-        "severity": "",
-        "description": "",
-        "pattern": "",
-        "patterns": [],
-        "malicious": [],
-        "benign": [],
-    }
-
-    lines = content.splitlines()
-    current_section = None
-    multiline_value = []
-    current_pattern = None
-    in_patterns_list = False
-    in_test_list = False
-
-    for line in lines:
-        stripped = line.strip()
-
-        # Skip empty lines
-        if not stripped:
-            continue
-
-        # Handle test sections - save any pending multiline values first
-        if stripped in ["malicious:", "benign:"]:
-            if multiline_value and current_section:
-                if current_section == "pattern" and not in_patterns_list:
-                    pattern_data[current_section] = (
-                        multiline_value[0]
-                        if len(multiline_value) == 1
-                        else "\n".join(multiline_value).strip()
-                    )
-                elif current_section == "description":
-                    pattern_data[current_section] = " ".join(multiline_value).strip()
-                multiline_value = []
-            current_section = stripped[:-1]  # Remove the colon
-            in_test_list = True
-            in_patterns_list = False
-            continue
-
-        # Handle list items in test sections (malicious/benign)
-        if (
-            stripped.startswith("- ")
-            and in_test_list
-            and current_section in ["malicious", "benign"]
-        ):
-            item = stripped[2:].strip()
-            # Remove quotes if present
-            if item.startswith('"') and item.endswith('"'):
-                item = item[1:-1]
-            elif item.startswith("'") and item.endswith("'"):
-                item = item[1:-1]
-            pattern_data[current_section].append(item)
-            continue
-
-        # Handle list items in patterns
-        if stripped.startswith("- ") and current_section == "patterns":
-            item = stripped[2:].strip()
-            if item.startswith("name:"):
-                if current_pattern:
-                    pattern_data["patterns"].append(current_pattern)
-                current_pattern = {
-                    "name": item[5:].strip(),
-                    "pattern": "",
-                    "description": "",
-                }
-                in_patterns_list = True
-                in_test_list = False
-            continue
-
-        # Handle key-value pairs
-        if ":" in line and not line.startswith("  "):
-            # Save previous multiline value
-            if multiline_value and current_section:
-                if current_section == "pattern" and not in_patterns_list:
-                    pattern_data[current_section] = (
-                        multiline_value[0]
-                        if len(multiline_value) == 1
-                        else "\n".join(multiline_value).strip()
-                    )
-                elif current_section == "description":
-                    pattern_data[current_section] = " ".join(multiline_value).strip()
-                multiline_value = []
-
-            key, _, value = line.partition(":")
-            key = key.strip()
-            value = value.strip()
-
-            if key in ["name", "severity"]:
-                pattern_data[key] = value
-                current_section = None
-                in_patterns_list = False
-                in_test_list = False
-            elif key in ["description", "pattern"]:
-                current_section = key
-                if value and value not in ["|", ">"]:
-                    multiline_value = [value]
-            elif key == "patterns":
-                current_section = key
-                in_patterns_list = True
-        # Handle indented content for patterns list
-        elif line.startswith("  ") and in_patterns_list and current_pattern:
-            key_val = line.strip()
-            if ":" in key_val:
-                key, _, value = key_val.partition(":")
-                key = key.strip()
-                value = value.strip()
-                if key == "pattern":
-                    current_pattern["pattern"] = value
-                elif key == "description":
-                    current_pattern["description"] = value
-        # Handle multiline content
-        elif (
-            current_section in ["description", "pattern"]
-            and line.startswith(" ")
-            and not in_patterns_list
-        ):
-            multiline_value.append(line.strip())
-
-    # Save last multiline value
-    if multiline_value and current_section:
-        if current_section == "pattern":
-            pattern_data[current_section] = (
-                multiline_value[0]
-                if len(multiline_value) == 1
-                else "\n".join(multiline_value).strip()
-            )
-        elif current_section == "description":
-            pattern_data[current_section] = " ".join(multiline_value).strip()
-
-    # Save last pattern in patterns list
-    if current_pattern:
-        pattern_data["patterns"].append(current_pattern)
-
-    return pattern_data
+from yaml_parser import parse_yaml_pattern
 
 
 def get_detection_intent(name: str, description: str) -> str:
-    """Extract what the pattern is intended to detect."""
     if "Detects" in description:
         parts = description.split("Detects", 1)
         if len(parts) > 1:
@@ -170,35 +26,21 @@ def get_detection_intent(name: str, description: str) -> str:
 
 
 def clean_regex_for_javascript(pattern: str) -> str:
-    """Remove inline regex flags that JavaScript doesn't support."""
-    import re as regex_module
-
-    # Remove inline flags like (?i), (?-i), (?s), etc.
-    cleaned = regex_module.sub(r"\(\?[imsxADSUXJ-]+\)", "", pattern)
+    cleaned = re.sub(r"\(\?[imsxADSUXJ-]+\)", "", pattern)
     return cleaned
 
 
 def generate_pattern_id(name: str) -> str:
-    """Generate a URL-safe ID from pattern name."""
     return name.replace("_", "-").replace(" ", "-").lower()
 
 
 def format_pattern_name(name: str) -> str:
-    """Convert pattern name from 'critical-01-base64-powershell' to '[01] Base64 Powershell'."""
-    # Extract the number and the descriptive part
-    # Pattern: severity-number-description
     parts = name.split("-")
 
     if len(parts) < 3:
         return name
-
-    # Get the number (second part)
     number = parts[1]
-
-    # Get the description (everything after the number)
     description = "-".join(parts[2:])
-
-    # Convert description to title case (capitalize each word)
     description_words = description.split("-")
     formatted_description = " ".join(word.capitalize() for word in description_words)
 
@@ -206,15 +48,12 @@ def format_pattern_name(name: str) -> str:
 
 
 def extract_malicious_examples(pattern_data: Dict) -> List[str]:
-    """Extract malicious test cases from pattern data."""
     if "malicious" in pattern_data and pattern_data["malicious"]:
-        # Return first 5 examples
         return pattern_data["malicious"][:5]
     return []
 
 
 def load_patterns(patterns_dir: Path) -> Dict[str, List[Tuple]]:
-    """Load all pattern files and organize by severity."""
     patterns_by_severity = {
         "critical": [],
         "high": [],
@@ -231,22 +70,18 @@ def load_patterns(patterns_dir: Path) -> Dict[str, List[Tuple]]:
 
 
 def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
-    """Prepare data for Jinja2 template."""
-    # Calculate counts
     total_count = (
         len(patterns_by_severity["critical"])
         + len(patterns_by_severity["high"])
         + len(patterns_by_severity["medium"])
     )
 
-    # Severity configuration
     severity_configs = [
         ("critical", "Critical", "Critical"),
         ("high", "High", "High"),
         ("medium", "Medium", "Medium"),
     ]
 
-    # Build severities data
     severities = []
     for severity_key, severity_label, severity_badge in severity_configs:
         patterns = []
@@ -284,41 +119,24 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
 
 
 def generate_html_documentation(output_dir: Path):
-    """Generate HTML pattern documentation."""
     patterns_dir = Path(__file__).parent.parent / "patterns"
     scripts_dir = Path(__file__).parent
-
-    # Load patterns
     patterns_by_severity = load_patterns(patterns_dir)
-
-    # Prepare template data
     template_data = prepare_template_data(patterns_by_severity)
-
-    # Setup Jinja2
     env = Environment(loader=FileSystemLoader(scripts_dir))
-    # Custom URL encoder that encodes forward slashes too
     env.filters["urlencode"] = lambda s: urllib.parse.quote(s, safe="")
     template = env.get_template("template.html")
-
-    # Render template
     html = template.render(**template_data)
-
-    # Create output directory
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Write HTML file
     html_file = output_dir / "index.html"
     html_file.write_text(html)
 
 
 def main():
-    """Generate documentation."""
     output_dir = Path(__file__).parent.parent / "docs"
 
     print(f"Generating HTML pattern documentation...")
     generate_html_documentation(output_dir)
-
-    # Create .nojekyll file for GitHub Pages
     nojekyll_file = output_dir / ".nojekyll"
     nojekyll_file.touch()
 

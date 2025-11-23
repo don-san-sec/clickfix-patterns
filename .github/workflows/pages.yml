@@ -8,7 +8,6 @@ on:
       - "patterns/**"
       - "scripts/generate_docs.py"
       - "scripts/template.html"
-      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -30,7 +29,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.x"
 
       - name: Install dependencies
         run: |
