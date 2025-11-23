@@ -34,11 +34,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyyaml jinja2
+          python3 -m pip install pyyaml jinja2
 
       - name: Generate documentation
         run: |
-          python scripts/generate_docs.py
+          python3 scripts/generate_docs.py
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
