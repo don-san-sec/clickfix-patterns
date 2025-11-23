@@ -34,7 +34,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install pyyaml jinja2
+          python3 -m pip install -r requirements.txt
 
       - name: Generate documentation
         run: |

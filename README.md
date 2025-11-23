@@ -9,7 +9,9 @@ ClickFix is a social engineering attack that tricks users into copying and execu
 ## Quick Start
 
 ```bash
+make setup      # Install dependencies (first time only)
 make test       # Run pattern tests
+make docs       # Generate documentation
 ```
 
 ## Documentation
