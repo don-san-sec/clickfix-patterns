@@ -16,7 +16,7 @@ make test       # Run pattern tests
 
 View the **[Pattern Documentation](https://don-san-sec.github.io/clickfix-patterns/)** on GitHub Pages for complete pattern details with descriptions, regex patterns, and severity levels. Auto-updated on every commit.
 
-The documentation includes an **interactive Pattern Tester** to test strings against all patterns instantly.
+The documentation includes an **interactive Pattern Tester** - click "🧪 Test String" in the header to test strings against all patterns instantly.
 
 ## Structure
 
@@ -43,10 +43,10 @@ Each pattern is a YAML file containing:
 
 The [hosted documentation](https://don-san-sec.github.io/clickfix-patterns/) includes an interactive **Pattern Tester**:
 
-1. Click "🧪 Pattern Tester" to expand the tester
+1. Click "🧪 Test String" button in the header
 2. Enter any string or command to test
-3. Click "Test String" to see results
-4. View which patterns match (if any) with severity levels
+3. Click "Test String" to see which patterns match
+4. Toggle back to "📋 Show Patterns" to view the pattern list
 
 Perfect for:
 - Finding false positives in legitimate commands

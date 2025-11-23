@@ -74,10 +74,42 @@
                 font-weight: 500;
             }
 
+            .header-actions {
+                margin-top: 1rem;
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .view-toggle-btn {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.8125rem;
+                font-weight: 500;
+                color: var(--text-primary);
+                transition: all 0.2s;
+            }
+
+            .view-toggle-btn:hover {
+                background: #f0f0f0;
+            }
+
+            .view-toggle-btn.active {
+                background: var(--text-primary);
+                color: white;
+                border-color: var(--text-primary);
+            }
+
             .container {
                 max-width: 1200px;
                 margin: 0 auto;
                 padding: 0 1rem 1.5rem;
+            }
+
+            .container.hidden {
+                display: none;
             }
 
             .layout {
@@ -423,55 +455,21 @@
 
             /* Pattern Tester Styles */
             .tester-section {
+                display: none;
                 max-width: 1200px;
                 margin: 0 auto 1.5rem;
                 padding: 0 1rem;
             }
 
-            .tester-toggle {
-                background: var(--bg-secondary);
-                border: 1px solid var(--border);
-                padding: 0.75rem 1rem;
-                border-radius: 4px;
-                cursor: pointer;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                transition: background-color 0.2s;
-                user-select: none;
-            }
-
-            .tester-toggle:hover {
-                background: #f0f0f0;
-            }
-
-            .tester-toggle-text {
-                font-size: 0.875rem;
-                font-weight: 500;
-                color: var(--text-primary);
-            }
-
-            .tester-toggle-arrow {
-                font-size: 0.75rem;
-                color: var(--text-secondary);
-                transition: transform 0.2s;
-            }
-
-            .tester-toggle.open .tester-toggle-arrow {
-                transform: rotate(180deg);
+            .tester-section.open {
+                display: block;
             }
 
             .tester-content {
-                display: none;
                 border: 1px solid var(--border);
-                border-top: none;
-                border-radius: 0 0 4px 4px;
+                border-radius: 4px;
                 padding: 1rem;
                 background: var(--bg-primary);
-            }
-
-            .tester-content.open {
-                display: block;
             }
 
             .tester-input-area {
@@ -631,18 +629,28 @@
                     Regex patterns to detect ClickFix/FileFix commands in
                     clipboard and other attack vectors
                 </p>
+                <div class="header-actions">
+                    <button
+                        class="view-toggle-btn active"
+                        id="patternsViewBtn"
+                        onclick="showPatternsView()"
+                    >
+                        📋 Show Patterns
+                    </button>
+                    <button
+                        class="view-toggle-btn"
+                        id="testerViewBtn"
+                        onclick="showTesterView()"
+                    >
+                        🧪 Test String
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Pattern Tester Section -->
-        <div class="tester-section">
-            <div class="tester-toggle" onclick="toggleTester()">
-                <span class="tester-toggle-text"
-                    >🧪 Pattern Tester - Test strings for false positives</span
-                >
-                <span class="tester-toggle-arrow">▼</span>
-            </div>
-            <div class="tester-content" id="testerContent">
+        <div class="tester-section" id="testerSection">
+            <div class="tester-content">
                 <div class="tester-input-area">
                     <label for="testerInput">Enter string to test:</label>
                     <textarea
@@ -667,7 +675,7 @@
             </div>
         </div>
 
-        <div class="container">
+        <div class="container" id="patternsContainer">
             <div class="layout">
                 <aside class="toc">
                     <h3>Patterns</h3>
@@ -782,18 +790,29 @@
                     severity: "{{ severity_key }}",
                     description: "{{ pattern.description | replace('"', '\\"') }}",
                     pattern: {{ pattern.regex | tojson }},
-                    regex: new RegExp({{ pattern.regex | tojson }}, 'i')
+                    regex: new RegExp({{ pattern.js_regex | tojson }}, 'is')
                 },
                 {% endfor %}
                 {% endfor %}
             ];
 
-            // Pattern tester functions
-            function toggleTester() {
-                const toggle = document.querySelector('.tester-toggle');
-                const content = document.getElementById('testerContent');
-                toggle.classList.toggle('open');
-                content.classList.toggle('open');
+            // View toggle functions
+            function showPatternsView() {
+                document.getElementById('patternsContainer').classList.remove('hidden');
+                document.getElementById('testerSection').classList.remove('open');
+                document.getElementById('patternsViewBtn').classList.add('active');
+                document.getElementById('testerViewBtn').classList.remove('active');
+            }
+
+            function showTesterView() {
+                document.getElementById('patternsContainer').classList.add('hidden');
+                document.getElementById('testerSection').classList.add('open');
+                document.getElementById('patternsViewBtn').classList.remove('active');
+                document.getElementById('testerViewBtn').classList.add('active');
+                // Focus on input
+                setTimeout(() => {
+                    document.getElementById('testerInput').focus();
+                }, 100);
             }
 
             function testPatterns() {

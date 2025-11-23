@@ -169,6 +169,15 @@ def get_detection_intent(name: str, description: str) -> str:
     return ""
 
 
+def clean_regex_for_javascript(pattern: str) -> str:
+    """Remove inline regex flags that JavaScript doesn't support."""
+    import re as regex_module
+
+    # Remove inline flags like (?i), (?-i), (?s), etc.
+    cleaned = regex_module.sub(r"\(\?[imsxADSUXJ-]+\)", "", pattern)
+    return cleaned
+
+
 def generate_pattern_id(name: str) -> str:
     """Generate a URL-safe ID from pattern name."""
     return name.replace("_", "-").replace(" ", "-").lower()
@@ -243,6 +252,7 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
         patterns = []
         for yaml_file, data in patterns_by_severity[severity_key]:
             regex_pattern = data["pattern"]
+            js_regex_pattern = clean_regex_for_javascript(regex_pattern)
             patterns.append(
                 {
                     "id": generate_pattern_id(data["name"]),
@@ -251,6 +261,7 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
                     "description": data["description"],
                     "intent": get_detection_intent(data["name"], data["description"]),
                     "regex": regex_pattern,
+                    "js_regex": js_regex_pattern,
                     "malicious_examples": extract_malicious_examples(data),
                 }
             )
