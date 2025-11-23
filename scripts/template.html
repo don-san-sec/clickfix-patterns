@@ -301,9 +301,17 @@
                 margin-bottom: 0.75rem;
             }
 
+            .button-container {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+                display: flex;
+                gap: 0.5rem;
+            }
+
             .pattern-regex {
                 padding: 0.75rem;
-                padding-right: 5rem;
+                padding-right: 9rem;
                 border-radius: 3px;
                 font-size: 0.8125rem;
                 overflow-x: auto;
@@ -334,10 +342,8 @@
                 word-break: break-word !important;
             }
 
-            .copy-btn {
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
+            .copy-btn,
+            .test-btn {
                 background: var(--text-primary);
                 border: none;
                 color: white;
@@ -351,8 +357,18 @@
                 letter-spacing: 0.3px;
             }
 
-            .copy-btn:hover {
+            .copy-btn:hover,
+            .test-btn:hover {
                 opacity: 0.8;
+            }
+
+            .test-btn {
+                background: #007acc;
+            }
+
+            .test-btn:hover {
+                background: #005a9e;
+                opacity: 1;
             }
 
             .copy-btn.copied {
@@ -458,13 +474,24 @@
 
                         {% if pattern.regex %}
                         <div class="regex-container">
-                            <button
-                                class="copy-btn"
-                                onclick="copyToClipboard(this)"
-                                data-regex="{{ pattern.regex|e }}"
-                            >
-                                Copy
-                            </button>
+                            <div class="button-container">
+                                <button
+                                    class="test-btn"
+                                    onclick="testOnRegex101(this)"
+                                    data-regex="{{ pattern.regex|e }}"
+                                    data-examples="{% for example in pattern.malicious_examples %}{{ example|e }}{% if not loop.last %}
+{% endif %}{% endfor %}"
+                                >
+                                    Test
+                                </button>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyToClipboard(this)"
+                                    data-regex="{{ pattern.regex|e }}"
+                                >
+                                    Copy
+                                </button>
+                            </div>
                             <pre><code class="language-regex">{{ pattern.regex }}</code></pre>
                         </div>
                         {% endif %} {% if pattern.malicious_examples %}
@@ -534,6 +561,20 @@
                 element.classList.toggle("open");
                 const content = element.nextElementSibling;
                 content.classList.toggle("open");
+            }
+
+            function testOnRegex101(button) {
+                const regex = button.getAttribute("data-regex");
+                const examples = button.getAttribute("data-examples");
+                const encodedRegex = encodeURIComponent(regex);
+                let url = `https://regex101.com/?regex=${encodedRegex}&flavor=python`;
+
+                if (examples && examples.trim()) {
+                    const encodedExamples = encodeURIComponent(examples);
+                    url += `&testString=${encodedExamples}`;
+                }
+
+                window.open(url, "_blank");
             }
 
             // Scroll to top button
