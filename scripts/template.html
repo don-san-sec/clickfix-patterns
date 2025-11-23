@@ -302,12 +302,17 @@
 
             .pattern-regex {
                 padding: 0.75rem;
-                padding-right: 4rem;
+                padding-right: 8rem;
                 border-radius: 3px;
                 font-size: 0.8125rem;
                 overflow-x: auto;
                 line-height: 1.4;
                 margin: 0;
+            }
+
+            .pattern-regex code {
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
             }
 
             pre[class*="language-"] {
@@ -316,17 +321,19 @@
                 padding-right: 4rem;
                 border-radius: 3px;
                 font-size: 0.8125rem;
+                overflow-x: auto !important;
             }
 
-            code[class*="language-"] {
-                font-family: "SF Mono", "Monaco", "Consolas", monospace;
-                font-size: 0.8125rem;
+            code[class*="language-"],
+            pre[class*="language-"] code {
+                font-family:
+                    "SF Mono", "Monaco", "Consolas", monospace !important;
+                font-size: 0.8125rem !important;
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
             }
 
             .copy-btn {
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
                 background: var(--text-primary);
                 border: none;
                 color: white;
@@ -349,9 +356,11 @@
             }
 
             .regex-actions {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
                 display: flex;
                 gap: 0.5rem;
-                margin-bottom: 0.5rem;
                 align-items: center;
             }
 
@@ -377,8 +386,8 @@
             }
 
             .regex101-link svg {
-                width: 12px;
-                height: 12px;
+                width: 10px;
+                height: 10px;
             }
 
             footer {
@@ -476,7 +485,28 @@
                             {{ pattern.description }}
                         </div>
 
-                        {% if pattern.malicious_examples %}
+                        {% if pattern.regex %}
+                        <div class="regex-container">
+                            <div class="regex-actions">
+                                <a
+                                    href="https://regex101.com/?regex={{ pattern.regex|urlencode }}&flags=gmi"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="regex101-link"
+                                >
+                                    Test
+                                </a>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyToClipboard(this)"
+                                    data-regex="{{ pattern.regex|e }}"
+                                >
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code class="language-regex">{{ pattern.regex }}</code></pre>
+                        </div>
+                        {% endif %} {% if pattern.malicious_examples %}
                         <div class="examples-section">
                             <div
                                 class="examples-toggle"
@@ -490,49 +520,6 @@
                                 <pre>{{ example|e }}</pre>
                                 {% endfor %}
                             </div>
-                        </div>
-                        {% endif %} {% if pattern.regex %}
-                        <div class="regex-container">
-                            <div class="regex-actions">
-                                <a
-                                    href="https://regex101.com/?regex={{ pattern.regex|urlencode }}&flags=gmi"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="regex101-link"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <path
-                                            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-                                        ></path>
-                                        <polyline
-                                            points="15 3 21 3 21 9"
-                                        ></polyline>
-                                        <line
-                                            x1="10"
-                                            y1="14"
-                                            x2="21"
-                                            y2="3"
-                                        ></line>
-                                    </svg>
-                                    Test on Regex101
-                                </a>
-                            </div>
-                            <button
-                                class="copy-btn"
-                                onclick="copyToClipboard(this)"
-                                data-regex="{{ pattern.regex|e }}"
-                            >
-                                Copy
-                            </button>
-                            <pre><code class="language-regex">{{ pattern.regex }}</code></pre>
                         </div>
                         {% endif %}
                     </div>
