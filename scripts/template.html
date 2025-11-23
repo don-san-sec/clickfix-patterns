@@ -486,7 +486,7 @@
                             </div>
                             <div class="examples-content">
                                 {% for example in pattern.malicious_examples %}
-                                <pre>{{ example }}</pre>
+                                <pre>{{ example|e }}</pre>
                                 {% endfor %}
                             </div>
                         </div>
