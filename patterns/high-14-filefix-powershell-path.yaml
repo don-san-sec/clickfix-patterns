@@ -1,4 +1,4 @@
-name: high-05-filefix-powershell-path
+name: high-14-filefix-powershell-path
 severity: high
 description: >
   Detects PowerShell scripts in suspicious temp locations. Common malware staging area.

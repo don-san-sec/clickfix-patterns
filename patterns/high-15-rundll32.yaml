@@ -1,4 +1,4 @@
-name: high-11-rundll32
+name: high-15-rundll32
 severity: high
 description: >
   Detects rundll32 executing DLLs downloaded from remote URLs. Living-off-the-land technique for stealthy execution.

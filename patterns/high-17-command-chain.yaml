@@ -1,4 +1,4 @@
-name: high-09-command-chain
+name: high-17-command-chain
 severity: high
 description: >
   Detects download commands chained with execution. Multi-stage attack pattern for automated payload delivery.

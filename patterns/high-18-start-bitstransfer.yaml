@@ -1,4 +1,4 @@
-name: high-19-start-bitstransfer
+name: high-18-start-bitstransfer
 severity: high
 description: >
   Detects Start-BitsTransfer downloading files from URLs. PowerShell cmdlet abused for malware downloads.

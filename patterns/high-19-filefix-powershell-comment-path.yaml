@@ -1,8 +1,8 @@
-name: high-55-filefix-powershell-comment-path
+name: high-19-filefix-powershell-comment-path
 severity: high
 description: >
   Detects FileFix technique where PowerShell command is followed by a comment with a fake file path.
-  Attackers use this to make the clipboard content appear as a legitimate file path in File Explorer's address bar.
+  Makes clipboard content appear as a legitimate file path in File Explorer's address bar.
 
 pattern: |
   (?i)powershell.*#\s*[A-Za-z]:\\.+\.(docx?|xlsx?|pptx?|pdf|zip|exe)

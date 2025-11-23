@@ -2,7 +2,7 @@ name: critical-05-certutil
 severity: critical
 description: >
   Detects certutil downloading files from URLs. Extremely common in ClickFix attacks (50-55% prevalence).
-  Legitimate certificate tool frequently abused for malware delivery with direct download capability.
+  Legitimate certificate tool frequently abused for malware delivery.
 
 pattern: |
   (?i)certutil.*-url(cache)?.*(http|ftp)s?://

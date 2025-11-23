@@ -1,8 +1,8 @@
-name: high-56-filefix-exe-path-comment
+name: high-20-filefix-exe-path-comment
 severity: high
 description: >
-  Detects FileFix variant 2 where a bare executable path is followed by spaces and a comment.
-  When pasted into File Explorer's address bar, the exe executes while the comment is ignored.
+  Detects FileFix variant where executable path is followed by spaces and a comment.
+  The exe executes in File Explorer's address bar while the comment is ignored.
 
 pattern: |
   (?i)^([A-Za-z]:|%[A-Za-z_]+%)\\.*\.exe\s{3,}#

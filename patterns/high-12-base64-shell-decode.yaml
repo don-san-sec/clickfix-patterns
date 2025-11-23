@@ -1,4 +1,4 @@
-name: high-01-base64-shell-decode
+name: high-12-base64-shell-decode
 severity: high
 description: >
   Detects base64 encoded commands decoded and executed in shell. Common in Linux/macOS ClickFix attacks.

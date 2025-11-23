@@ -1,4 +1,4 @@
-name: high-02-shell-substitution-download
+name: high-13-shell-substitution-download
 severity: high
 description: >
   Detects shell command substitution, backticks, and process substitution downloading remote scripts.

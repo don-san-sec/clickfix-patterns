@@ -1,15 +1,8 @@
-name: high-12-installutil
+name: high-16-installutil
 severity: high
 description: >
   Detects installutil executing untrusted assemblies. .NET tool abused for code execution bypass.
-  to trigger Uninstall methods that contain malicious code, /logfile= and /LogToConsole=false
-  flags to suppress output and avoid detection, and loading assemblies with suspicious names
-  or from non-standard locations. Legitimate InstallUtil usage involves installing services
-  and components from Program Files or trusted installation directories. The /installtype parameter
-  can specify custom installation behavior. This pattern is experimental because legitimate
-  software installations and .NET deployments may use InstallUtil, requiring allowlisting of
-  known-good assemblies and deployment pipelines. Detection focuses on suspicious paths combined
-  with common evasion flags and unusual file locations.
+  Focuses on assemblies loaded from suspicious temp locations with common evasion flags.
 
 pattern: |
   (?i)installutil.*(temp|appdata|public|programdata).*\.(exe|dll)

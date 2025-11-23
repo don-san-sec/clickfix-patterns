@@ -2,9 +2,7 @@ name: critical-09-regsvr32
 severity: critical
 description: >
   Detects regsvr32 executing remote scriptlets or DLLs. Application whitelisting bypass technique.
-  various flag combinations, URL protocols (HTTP/HTTPS/FTP), and .sct file extensions in any context.
-  Legitimate use of regsvr32 involves local DLL files in System32 or Program Files, never remote URLs
-  or scriptlets. Also detects local .sct files which may have been dropped by other malware components.
+  Detects various flag combinations, URL protocols (HTTP/HTTPS/FTP), and .sct file extensions.
 
 pattern: |
   (?i)regsvr32.*(https?://|ftp://.*\.sct|scrobj\.dll.*https?://|\.sct)

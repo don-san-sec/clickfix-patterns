@@ -1,4 +1,4 @@
-name: critical-03-mshta
+name: critical-04-mshta
 severity: critical
 description: >
   Detects mshta.exe executing remote HTA files or inline scripts. Commonly abused to bypass application whitelisting.

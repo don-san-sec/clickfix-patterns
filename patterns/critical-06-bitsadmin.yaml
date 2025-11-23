@@ -2,8 +2,7 @@ name: critical-06-bitsadmin
 severity: critical
 description: >
   Detects bitsadmin downloading files from URLs. Common in ClickFix attacks (35-45% prevalence).
-  Windows background transfer utility abused for payload downloads with persistent download capability.
-  Detection includes various flag orderings, spacing variations, and both uppercase and lowercase syntax.
+  Windows background transfer utility abused for payload downloads.
 
 pattern: |
   (?i)bitsadmin.*/(transfer|download|addfile).*(https?|ftp)://

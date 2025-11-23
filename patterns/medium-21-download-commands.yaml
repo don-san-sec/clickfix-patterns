@@ -1,4 +1,4 @@
-name: medium-15-download-commands
+name: medium-21-download-commands
 severity: medium
 description: >
   Detects general download commands (curl, wget, IWR) from remote URLs. Requires allowlisting for legitimate use.

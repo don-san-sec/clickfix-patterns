@@ -1,4 +1,4 @@
-name: critical-02a-iex-download-first
+name: critical-02-iex-download-first
 severity: critical
 description: >
   Detects PowerShell downloading and executing remote scripts with IEX. Hallmark of fileless malware attacks.

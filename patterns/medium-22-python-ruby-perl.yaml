@@ -1,8 +1,8 @@
-name: medium-61-python-ruby-perl
+name: medium-22-python-ruby-perl
 severity: medium
 description: >
   Detects scripting languages downloading and executing remote scripts. Uncommon in ClickFix attacks (5-10% prevalence).
-  High legitimate usage in development environments. Requires context to distinguish malicious use.
+  High legitimate usage in development environments requires context to distinguish malicious use.
 
 pattern: |
   (?i)(python|ruby|perl).*(urllib|requests|eval|exec|net::http|lwp).*https?://|(curl|wget).*https?://.*\|.*(python|ruby|perl)

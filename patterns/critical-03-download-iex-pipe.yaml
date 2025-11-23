@@ -1,4 +1,4 @@
-name: critical-02b-download-iex-pipe
+name: critical-03-download-iex-pipe
 severity: critical
 description: >
   Detects WebClient.DownloadString piped to IEX. Classic ClickFix pattern for in-memory script execution.
