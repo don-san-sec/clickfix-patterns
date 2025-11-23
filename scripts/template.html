@@ -429,7 +429,7 @@
                             <a
                                 href="#{{ pattern.id }}"
                                 class="{{ severity_key }}"
-                                >{{ pattern.name }}</a
+                                >{{ pattern.display_name }}</a
                             >
                         </li>
                         {% endfor %} {% endif %} {% endfor %}
@@ -445,7 +445,9 @@
                         id="{{ pattern.id }}"
                     >
                         <div class="pattern-header">
-                            <div class="pattern-name">{{ pattern.name }}</div>
+                            <div class="pattern-name">
+                                {{ pattern.display_name }}
+                            </div>
                             <span class="severity-badge {{ severity_key }}"
                                 >{{ severity_data.badge }}</span
                             >

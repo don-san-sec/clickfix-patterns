@@ -174,6 +174,28 @@ def generate_pattern_id(name: str) -> str:
     return name.replace("_", "-").replace(" ", "-").lower()
 
 
+def format_pattern_name(name: str) -> str:
+    """Convert pattern name from 'critical-01-base64-powershell' to '1. Base64 Powershell'."""
+    # Extract the number and the descriptive part
+    # Pattern: severity-number-description
+    parts = name.split("-")
+
+    if len(parts) < 3:
+        return name
+
+    # Get the number (second part)
+    number = parts[1]
+
+    # Get the description (everything after the number)
+    description = "-".join(parts[2:])
+
+    # Convert description to title case (capitalize each word)
+    description_words = description.split("-")
+    formatted_description = " ".join(word.capitalize() for word in description_words)
+
+    return f"{number}. {formatted_description}"
+
+
 def extract_malicious_examples(pattern_data: Dict) -> List[str]:
     """Extract malicious test cases from pattern data."""
     if "malicious" in pattern_data and pattern_data["malicious"]:
@@ -225,6 +247,7 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
                 {
                     "id": generate_pattern_id(data["name"]),
                     "name": data["name"],
+                    "display_name": format_pattern_name(data["name"]),
                     "description": data["description"],
                     "intent": get_detection_intent(data["name"], data["description"]),
                     "regex": regex_pattern,
