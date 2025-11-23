@@ -232,11 +232,43 @@
                 flex-wrap: wrap;
             }
 
+            .pattern-name-container {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex: 1;
+            }
+
             .pattern-name {
                 font-size: 0.9375rem;
                 font-weight: 500;
                 color: var(--text-primary);
                 font-family: "SF Mono", "Monaco", "Consolas", monospace;
+            }
+
+            .copy-link-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0.25rem;
+                color: var(--text-secondary);
+                font-size: 0.875rem;
+                opacity: 0;
+                transition:
+                    opacity 0.2s,
+                    color 0.2s;
+            }
+
+            .pattern:hover .copy-link-btn {
+                opacity: 1;
+            }
+
+            .copy-link-btn:hover {
+                color: var(--text-primary);
+            }
+
+            .copy-link-btn.copied {
+                color: var(--text-primary);
             }
 
             .severity-badge {
@@ -594,6 +626,14 @@
                 font-weight: 500;
                 font-size: 0.875rem;
                 color: var(--text-primary);
+                cursor: pointer;
+                text-decoration: underline;
+                text-decoration-color: transparent;
+                transition: text-decoration-color 0.2s;
+            }
+
+            .tester-match-name:hover {
+                text-decoration-color: var(--text-primary);
             }
 
             .tester-match-desc {
@@ -624,10 +664,16 @@
     <body>
         <div class="header">
             <div class="header-content">
-                <h1>ClickFix Detection Patterns</h1>
+                <h1>
+                    <a
+                        href="https://don-san-sec.github.io/clickfix-patterns/"
+                        style="color: inherit; text-decoration: none"
+                        >ClickFix Pattern Library</a
+                    >
+                </h1>
                 <p class="subtitle">
-                    Regex patterns to detect ClickFix/FileFix commands in
-                    clipboard and other attack vectors
+                    Regex patterns to detect ClickFix/FileFix social engineering
+                    attacks
                 </p>
                 <div class="header-actions">
                     <button
@@ -703,11 +749,20 @@
                         id="{{ pattern.id }}"
                     >
                         <div class="pattern-header">
-                            <div class="pattern-name">
-                                {{ pattern.display_name }}
+                            <div class="pattern-name-container">
+                                <div class="pattern-name">
+                                    {{ pattern.display_name }}
+                                </div>
+                                <button
+                                    class="copy-link-btn"
+                                    onclick="copyPatternLink('{{ pattern.id }}')"
+                                    title="Copy link to this pattern"
+                                >
+                                    🔗
+                                </button>
                             </div>
                             <span class="severity-badge {{ severity_key }}"
-                                >{{ severity_data.badge }}</span
+                                >{{ severity_badge }}</span
                             >
                         </div>
                         <div class="pattern-description">
@@ -786,6 +841,7 @@
                 {% for severity_key, severity_data in severities %}
                 {% for pattern in severity_data.patterns %}
                 {
+                    id: "{{ pattern.id }}",
                     name: "{{ pattern.display_name }}",
                     severity: "{{ severity_key }}",
                     description: "{{ pattern.description | replace('"', '\\"') }}",
@@ -797,11 +853,42 @@
             ];
 
             // View toggle functions
-            function showPatternsView() {
+            function showPatternsView(patternId) {
                 document.getElementById('patternsContainer').classList.remove('hidden');
                 document.getElementById('testerSection').classList.remove('open');
                 document.getElementById('patternsViewBtn').classList.add('active');
                 document.getElementById('testerViewBtn').classList.remove('active');
+
+                // If pattern ID provided, scroll to it
+                if (patternId) {
+                    setTimeout(() => {
+                        const element = document.getElementById(patternId);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            // Briefly highlight the pattern
+                            element.style.backgroundColor = '#fffacd';
+                            setTimeout(() => {
+                                element.style.backgroundColor = '';
+                            }, 1500);
+                        }
+                    }, 100);
+                }
+            }
+
+            function copyPatternLink(patternId) {
+                const url = window.location.origin + window.location.pathname + '#' + patternId;
+                navigator.clipboard.writeText(url).then(() => {
+                    const btn = event.target;
+                    const originalText = btn.textContent;
+                    btn.textContent = '✓';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy link:', err);
+                });
             }
 
             function showTesterView() {
@@ -858,7 +945,7 @@
                         html += `
                             <div class="tester-match ${match.severity}">
                                 <div class="tester-match-header">
-                                    <div class="tester-match-name">${match.name}</div>
+                                    <div class="tester-match-name" onclick="showPatternsView('${match.id}')">${match.name}</div>
                                     <span class="severity-badge ${match.severity}">${match.severity}</span>
                                 </div>
                                 <div class="tester-match-desc">${match.description}</div>
