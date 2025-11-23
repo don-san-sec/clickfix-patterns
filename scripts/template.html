@@ -420,6 +420,207 @@
             .scroll-top.visible {
                 display: flex;
             }
+
+            /* Pattern Tester Styles */
+            .tester-section {
+                max-width: 1200px;
+                margin: 0 auto 1.5rem;
+                padding: 0 1rem;
+            }
+
+            .tester-toggle {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                padding: 0.75rem 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: background-color 0.2s;
+                user-select: none;
+            }
+
+            .tester-toggle:hover {
+                background: #f0f0f0;
+            }
+
+            .tester-toggle-text {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: var(--text-primary);
+            }
+
+            .tester-toggle-arrow {
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                transition: transform 0.2s;
+            }
+
+            .tester-toggle.open .tester-toggle-arrow {
+                transform: rotate(180deg);
+            }
+
+            .tester-content {
+                display: none;
+                border: 1px solid var(--border);
+                border-top: none;
+                border-radius: 0 0 4px 4px;
+                padding: 1rem;
+                background: var(--bg-primary);
+            }
+
+            .tester-content.open {
+                display: block;
+            }
+
+            .tester-input-area {
+                margin-bottom: 0.75rem;
+            }
+
+            .tester-input-area label {
+                display: block;
+                font-size: 0.8125rem;
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                color: var(--text-primary);
+            }
+
+            #testerInput {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                font-family: "SF Mono", "Monaco", "Consolas", monospace;
+                font-size: 0.8125rem;
+                resize: vertical;
+                min-height: 80px;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+            }
+
+            #testerInput:focus {
+                outline: none;
+                border-color: var(--text-primary);
+            }
+
+            .tester-buttons {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .tester-btn {
+                padding: 0.5rem 1rem;
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                font-size: 0.8125rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+            }
+
+            .tester-btn:hover {
+                background: #f0f0f0;
+            }
+
+            .tester-btn-primary {
+                background: var(--text-primary);
+                color: white;
+                border-color: var(--text-primary);
+            }
+
+            .tester-btn-primary:hover {
+                background: #000;
+                border-color: #000;
+            }
+
+            .tester-results {
+                margin-top: 0.75rem;
+            }
+
+            .tester-stats {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.75rem;
+            }
+
+            .tester-stat {
+                text-align: center;
+            }
+
+            .tester-stat-value {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+
+            .tester-stat-label {
+                color: var(--text-secondary);
+                font-size: 0.75rem;
+                margin-top: 0.25rem;
+            }
+
+            .tester-match {
+                background: var(--bg-primary);
+                border: 1px solid var(--border);
+                border-left: 3px solid var(--critical);
+                border-radius: 3px;
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .tester-match.high {
+                border-left-color: var(--high);
+            }
+
+            .tester-match.medium {
+                border-left-color: var(--medium);
+            }
+
+            .tester-match-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+            }
+
+            .tester-match-name {
+                font-weight: 500;
+                font-size: 0.875rem;
+                color: var(--text-primary);
+            }
+
+            .tester-match-desc {
+                color: var(--text-secondary);
+                font-size: 0.8125rem;
+                line-height: 1.4;
+            }
+
+            .tester-no-match {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                padding: 1.5rem;
+                text-align: center;
+                color: var(--text-secondary);
+            }
+
+            .tester-no-match-icon {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .tester-no-match strong {
+                color: var(--text-primary);
+            }
         </style>
     </head>
     <body>
@@ -430,6 +631,39 @@
                     Regex patterns to detect ClickFix/FileFix commands in
                     clipboard and other attack vectors
                 </p>
+            </div>
+        </div>
+
+        <!-- Pattern Tester Section -->
+        <div class="tester-section">
+            <div class="tester-toggle" onclick="toggleTester()">
+                <span class="tester-toggle-text"
+                    >🧪 Pattern Tester - Test strings for false positives</span
+                >
+                <span class="tester-toggle-arrow">▼</span>
+            </div>
+            <div class="tester-content" id="testerContent">
+                <div class="tester-input-area">
+                    <label for="testerInput">Enter string to test:</label>
+                    <textarea
+                        id="testerInput"
+                        placeholder='Example: powershell -Command "Get-Process"'
+                    ></textarea>
+                </div>
+
+                <div class="tester-buttons">
+                    <button
+                        class="tester-btn tester-btn-primary"
+                        onclick="testPatterns()"
+                    >
+                        Test String
+                    </button>
+                    <button class="tester-btn" onclick="clearTester()">
+                        Clear
+                    </button>
+                </div>
+
+                <div id="testerResults" class="tester-results"></div>
             </div>
         </div>
 
@@ -539,6 +773,101 @@
         </button>
 
         <script>
+            // Pattern data for testing
+            const patternData = [
+                {% for severity_key, severity_data in severities %}
+                {% for pattern in severity_data.patterns %}
+                {
+                    name: "{{ pattern.display_name }}",
+                    severity: "{{ severity_key }}",
+                    description: "{{ pattern.description | replace('"', '\\"') }}",
+                    pattern: {{ pattern.regex | tojson }},
+                    regex: new RegExp({{ pattern.regex | tojson }}, 'i')
+                },
+                {% endfor %}
+                {% endfor %}
+            ];
+
+            // Pattern tester functions
+            function toggleTester() {
+                const toggle = document.querySelector('.tester-toggle');
+                const content = document.getElementById('testerContent');
+                toggle.classList.toggle('open');
+                content.classList.toggle('open');
+            }
+
+            function testPatterns() {
+                const input = document.getElementById('testerInput').value;
+                const resultsDiv = document.getElementById('testerResults');
+
+                if (!input.trim()) {
+                    resultsDiv.innerHTML = '<div class="tester-no-match"><div class="tester-no-match-icon">⚠️</div><div><strong>Please enter a string to test</strong></div></div>';
+                    return;
+                }
+
+                const matches = [];
+                let criticalCount = 0;
+                let highCount = 0;
+                let mediumCount = 0;
+
+                for (const pattern of patternData) {
+                    if (pattern.regex.test(input)) {
+                        matches.push(pattern);
+                        if (pattern.severity === 'critical') criticalCount++;
+                        else if (pattern.severity === 'high') highCount++;
+                        else if (pattern.severity === 'medium') mediumCount++;
+                    }
+                }
+
+                if (matches.length === 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="tester-no-match">
+                            <div class="tester-no-match-icon">✅</div>
+                            <div><strong>No patterns matched!</strong></div>
+                            <div style="margin-top: 10px; font-size: 0.9em;">This string appears safe.</div>
+                        </div>
+                    `;
+                } else {
+                    let html = '<div class="tester-stats">';
+                    html += '<div class="tester-stat"><div class="tester-stat-value">' + matches.length + '</div><div class="tester-stat-label">Matches</div></div>';
+                    html += '<div class="tester-stat"><div class="tester-stat-value">' + criticalCount + '</div><div class="tester-stat-label">Critical</div></div>';
+                    html += '<div class="tester-stat"><div class="tester-stat-value">' + highCount + '</div><div class="tester-stat-label">High</div></div>';
+                    html += '<div class="tester-stat"><div class="tester-stat-value">' + mediumCount + '</div><div class="tester-stat-label">Medium</div></div>';
+                    html += '</div>';
+
+                    for (const match of matches) {
+                        html += `
+                            <div class="tester-match ${match.severity}">
+                                <div class="tester-match-header">
+                                    <div class="tester-match-name">${match.name}</div>
+                                    <span class="severity-badge ${match.severity}">${match.severity}</span>
+                                </div>
+                                <div class="tester-match-desc">${match.description}</div>
+                            </div>
+                        `;
+                    }
+
+                    resultsDiv.innerHTML = html;
+                }
+            }
+
+            function clearTester() {
+                document.getElementById('testerInput').value = '';
+                document.getElementById('testerResults').innerHTML = '';
+            }
+
+            // Allow Ctrl+Enter to test
+            document.addEventListener('DOMContentLoaded', function() {
+                const input = document.getElementById('testerInput');
+                if (input) {
+                    input.addEventListener('keydown', function(e) {
+                        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                            testPatterns();
+                        }
+                    });
+                }
+            });
+
             function copyToClipboard(button) {
                 const text = button.getAttribute("data-regex");
                 navigator.clipboard
