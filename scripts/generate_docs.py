@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate pattern documentation from YAML files
-Creates PATTERNS.md with all pattern details
+Generate HTML pattern documentation from YAML files for GitHub Pages
 """
 
 import re
@@ -129,8 +128,19 @@ def parse_yaml_pattern(yaml_file: Path) -> Dict:
     return pattern_data
 
 
-def generate_documentation(output_file: Path):
-    """Generate pattern documentation."""
+def html_escape(text: str) -> str:
+    """Escape HTML special characters."""
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&#39;")
+    )
+
+
+def generate_html_documentation(output_dir: Path):
+    """Generate HTML pattern documentation."""
     patterns_dir = Path(__file__).parent.parent / "patterns"
 
     # Collect all patterns by severity
@@ -153,91 +163,340 @@ def generate_documentation(output_file: Path):
             if severity in patterns_by_severity:
                 patterns_by_severity[severity].append((yaml_file, pattern_data))
 
-    # Generate markdown
-    with open(output_file, "w") as f:
-        f.write("# ClickFix Detection Patterns\n\n")
+    # Count patterns
+    stable_count = (
+        len(patterns_by_severity["critical"])
+        + len(patterns_by_severity["high"])
+        + len(patterns_by_severity["medium"])
+    )
+    experimental_count = len(patterns_by_severity["experimental"])
+    total_count = stable_count + experimental_count
 
-        # Count patterns
-        stable_count = (
-            len(patterns_by_severity["critical"])
-            + len(patterns_by_severity["high"])
-            + len(patterns_by_severity["medium"])
-        )
-        experimental_count = len(patterns_by_severity["experimental"])
+    # Create output directory
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate HTML
+    html_file = output_dir / "index.html"
+    with open(html_file, "w") as f:
+        f.write("""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickFix Detection Patterns</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            font-size: 1.8em;
+        }
+
+        h2.critical {
+            border-bottom-color: #e74c3c;
+        }
+
+        h2.high {
+            border-bottom-color: #e67e22;
+        }
+
+        h2.medium {
+            border-bottom-color: #f39c12;
+        }
+
+        h2.experimental {
+            border-bottom-color: #9b59b6;
+        }
+
+        .pattern {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .pattern.critical {
+            border-left-color: #e74c3c;
+        }
+
+        .pattern.high {
+            border-left-color: #e67e22;
+        }
+
+        .pattern.medium {
+            border-left-color: #f39c12;
+        }
+
+        .pattern.experimental {
+            border-left-color: #9b59b6;
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .pattern-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .severity-badge.critical {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .severity-badge.high {
+            background: #e67e22;
+            color: white;
+        }
+
+        .severity-badge.medium {
+            background: #f39c12;
+            color: white;
+        }
+
+        .severity-badge.experimental {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .pattern-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+
+        .pattern-regex {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .stats {
+            background: #ecf0f1;
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stats strong {
+            color: #2c3e50;
+            font-size: 1.2em;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ClickFix Detection Patterns</h1>
+        <p class="subtitle">Comprehensive detection patterns for ClickFix social engineering attacks</p>
+
+        <div class="stats">
+            <strong>""")
 
         f.write(
-            f"**{stable_count} stable + {experimental_count} experimental = {stable_count + experimental_count} total**\n\n"
+            f"{stable_count} stable + {experimental_count} experimental = {total_count} total patterns</strong>"
         )
-        f.write("---\n\n")
+
+        f.write("""
+        </div>
+""")
 
         # Critical patterns
         if patterns_by_severity["critical"]:
-            f.write("## Critical Severity\n\n")
+            f.write('        <h2 class="critical">Critical Severity</h2>\n')
             for yaml_file, data in patterns_by_severity["critical"]:
-                f.write(f"### {data['name']}\n\n")
-                f.write(f"{data['description']}\n\n")
+                f.write(f'        <div class="pattern critical">\n')
+                f.write(f'            <div class="pattern-header">\n')
+                f.write(
+                    f'                <div class="pattern-name">{html_escape(data["name"])}</div>\n'
+                )
+                f.write(
+                    f'                <span class="severity-badge critical">Critical</span>\n'
+                )
+                f.write(f"            </div>\n")
+                f.write(
+                    f'            <div class="pattern-description">{html_escape(data["description"])}</div>\n'
+                )
 
-                if data["patterns"]:
-                    for p in data["patterns"]:
-                        f.write(f"- `{p['pattern']}`\n")
-                elif data["pattern"]:
-                    f.write(f"```regex\n{data['pattern']}\n```\n\n")
+                if data["pattern"]:
+                    f.write(
+                        f'            <div class="pattern-regex">{html_escape(data["pattern"])}</div>\n'
+                    )
 
-                f.write("---\n\n")
+                f.write(f"        </div>\n\n")
 
         # High patterns
         if patterns_by_severity["high"]:
-            f.write("## High Severity\n\n")
+            f.write('        <h2 class="high">High Severity</h2>\n')
             for yaml_file, data in patterns_by_severity["high"]:
-                f.write(f"### {data['name']}\n\n")
-                f.write(f"{data['description']}\n\n")
+                f.write(f'        <div class="pattern high">\n')
+                f.write(f'            <div class="pattern-header">\n')
+                f.write(
+                    f'                <div class="pattern-name">{html_escape(data["name"])}</div>\n'
+                )
+                f.write(
+                    f'                <span class="severity-badge high">High</span>\n'
+                )
+                f.write(f"            </div>\n")
+                f.write(
+                    f'            <div class="pattern-description">{html_escape(data["description"])}</div>\n'
+                )
 
-                if data["patterns"]:
-                    for p in data["patterns"]:
-                        f.write(f"- `{p['pattern']}`\n")
-                elif data["pattern"]:
-                    f.write(f"```regex\n{data['pattern']}\n```\n\n")
+                if data["pattern"]:
+                    f.write(
+                        f'            <div class="pattern-regex">{html_escape(data["pattern"])}</div>\n'
+                    )
 
-                f.write("---\n\n")
+                f.write(f"        </div>\n\n")
 
         # Medium patterns
         if patterns_by_severity["medium"]:
-            f.write("## Medium Severity\n\n")
+            f.write('        <h2 class="medium">Medium Severity</h2>\n')
             for yaml_file, data in patterns_by_severity["medium"]:
-                f.write(f"### {data['name']}\n\n")
-                f.write(f"{data['description']}\n\n")
+                f.write(f'        <div class="pattern medium">\n')
+                f.write(f'            <div class="pattern-header">\n')
+                f.write(
+                    f'                <div class="pattern-name">{html_escape(data["name"])}</div>\n'
+                )
+                f.write(
+                    f'                <span class="severity-badge medium">Medium</span>\n'
+                )
+                f.write(f"            </div>\n")
+                f.write(
+                    f'            <div class="pattern-description">{html_escape(data["description"])}</div>\n'
+                )
 
-                if data["patterns"]:
-                    for p in data["patterns"]:
-                        f.write(f"- `{p['pattern']}`\n")
-                elif data["pattern"]:
-                    f.write(f"```regex\n{data['pattern']}\n```\n\n")
+                if data["pattern"]:
+                    f.write(
+                        f'            <div class="pattern-regex">{html_escape(data["pattern"])}</div>\n'
+                    )
 
-                f.write("---\n\n")
+                f.write(f"        </div>\n\n")
 
         # Experimental patterns
         if patterns_by_severity["experimental"]:
-            f.write("## Experimental Patterns\n\n")
+            f.write('        <h2 class="experimental">Experimental Patterns</h2>\n')
             for yaml_file, data in patterns_by_severity["experimental"]:
-                f.write(f"### {data['name']}\n\n")
-                f.write(f"{data['description']}\n\n")
+                f.write(f'        <div class="pattern experimental">\n')
+                f.write(f'            <div class="pattern-header">\n')
+                f.write(
+                    f'                <div class="pattern-name">{html_escape(data["name"])}</div>\n'
+                )
+                f.write(
+                    f'                <span class="severity-badge experimental">Experimental</span>\n'
+                )
+                f.write(f"            </div>\n")
+                f.write(
+                    f'            <div class="pattern-description">{html_escape(data["description"])}</div>\n'
+                )
 
-                if data["patterns"]:
-                    for p in data["patterns"]:
-                        f.write(f"- `{p['pattern']}`\n")
-                elif data["pattern"]:
-                    f.write(f"```regex\n{data['pattern']}\n```\n\n")
+                if data["pattern"]:
+                    f.write(
+                        f'            <div class="pattern-regex">{html_escape(data["pattern"])}</div>\n'
+                    )
 
-                f.write("---\n\n")
+                f.write(f"        </div>\n\n")
+
+        f.write("""
+        <footer>
+            <p>Generated from <a href="https://github.com/dsepashvili/clickfix" target="_blank">ClickFix Detection Patterns</a></p>
+        </footer>
+    </div>
+</body>
+</html>
+""")
 
 
 def main():
     """Generate documentation."""
-    output_file = Path(__file__).parent.parent / "PATTERNS.md"
+    output_dir = Path(__file__).parent.parent / "docs"
 
-    print(f"Generating pattern documentation...")
-    generate_documentation(output_file)
-    print(f"✓ Generated {output_file}")
+    print(f"Generating HTML pattern documentation...")
+    generate_html_documentation(output_dir)
+
+    # Create .nojekyll file for GitHub Pages
+    nojekyll_file = output_dir / ".nojekyll"
+    nojekyll_file.touch()
+
+    print(f"✓ Generated {output_dir / 'index.html'}")
+    print(f"✓ Created {nojekyll_file}")
 
 
 if __name__ == "__main__":

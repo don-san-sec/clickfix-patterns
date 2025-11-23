@@ -28,3 +28,6 @@ patterns/test_report.txt
 # Temporary files
 *.tmp
 .cache/
+
+# Generated documentation
+docs/
