@@ -4,8 +4,6 @@ Regex patterns for detecting ClickFix social engineering attacks.
 
 ![ClickFix Pattern Library](.github/media/banner.png)
 
----
-
 ## What is ClickFix?
 
 ClickFix is a social engineering technique that tricks users into copying and executing malicious commands. Attackers disguise PowerShell, bash, or other scripts as "fixes" for fake errors. This library provides detection patterns to identify these attacks.
