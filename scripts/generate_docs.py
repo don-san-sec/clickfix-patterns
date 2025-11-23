@@ -175,7 +175,7 @@ def generate_pattern_id(name: str) -> str:
 
 
 def format_pattern_name(name: str) -> str:
-    """Convert pattern name from 'critical-01-base64-powershell' to '1. Base64 Powershell'."""
+    """Convert pattern name from 'critical-01-base64-powershell' to '[01] Base64 Powershell'."""
     # Extract the number and the descriptive part
     # Pattern: severity-number-description
     parts = name.split("-")
@@ -193,7 +193,7 @@ def format_pattern_name(name: str) -> str:
     description_words = description.split("-")
     formatted_description = " ".join(word.capitalize() for word in description_words)
 
-    return f"{number}. {formatted_description}"
+    return f"[{number}] {formatted_description}"
 
 
 def extract_malicious_examples(pattern_data: Dict) -> List[str]:
