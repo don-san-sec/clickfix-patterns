@@ -262,7 +262,8 @@ def generate_html_documentation(output_dir: Path):
 
     # Setup Jinja2
     env = Environment(loader=FileSystemLoader(scripts_dir))
-    env.filters["urlencode"] = urllib.parse.quote_plus
+    # Custom URL encoder that encodes forward slashes too
+    env.filters["urlencode"] = lambda s: urllib.parse.quote(s, safe="")
     template = env.get_template("template.html")
 
     # Render template

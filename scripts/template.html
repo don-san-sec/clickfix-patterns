@@ -433,7 +433,8 @@
             <div class="header-content">
                 <h1>ClickFix Detection Patterns</h1>
                 <p class="subtitle">
-                    Detection patterns for ClickFix social engineering attacks
+                    Regex patterns to detect ClickFix/FileFix commands in
+                    clipboard and other attack vectors
                 </p>
             </div>
         </div>
@@ -526,7 +527,8 @@
                             </div>
                             <button
                                 class="copy-btn"
-                                onclick="copyToClipboard(this, {{ pattern.regex|tojson }})"
+                                onclick="copyToClipboard(this)"
+                                data-regex="{{ pattern.regex|e }}"
                             >
                                 Copy
                             </button>
@@ -562,7 +564,8 @@
         </button>
 
         <script>
-            function copyToClipboard(button, text) {
+            function copyToClipboard(button) {
+                const text = button.getAttribute("data-regex");
                 navigator.clipboard
                     .writeText(text)
                     .then(() => {
