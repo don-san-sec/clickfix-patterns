@@ -21,10 +21,10 @@ Download **[PATTERNS.md](../../releases/latest)** from the latest release for co
 
 ```
 patterns/                           # Pattern definitions (YAML only)
-├── critical-XX-name.yaml           # Tier 1: Critical risk (6 patterns)
-├── high-XX-name.yaml               # Tier 2: High risk (10 patterns)
-├── medium-XX-name.yaml             # Tier 3: Medium risk (7 patterns)
-└── experimental-*-XX-name.yaml     # Require allowlists (5 patterns)
+├── critical-XX-name.yaml           # Tier 1: Critical risk patterns
+├── high-XX-name.yaml               # Tier 2: High risk patterns
+├── medium-XX-name.yaml             # Tier 3: Medium risk patterns
+└── experimental-*-XX-name.yaml     # Patterns requiring allowlists
 
 scripts/                            # Tools
 ├── run_tests.py                    # Pattern testing

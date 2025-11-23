@@ -1,5 +1,5 @@
-name: medium-14-osascript
-severity: medium
+name: critical-10-osascript
+severity: critical
 description: >
   Detects osascript executing remote scripts or inline AppleScript. macOS-specific attack vector.
 

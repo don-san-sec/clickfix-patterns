@@ -1,5 +1,5 @@
-name: experimental-high-17-installutil
-severity: high-experimental
+name: high-12-installutil
+severity: high
 description: >
   Detects installutil executing untrusted assemblies. .NET tool abused for code execution bypass.
   to trigger Uninstall methods that contain malicious code, /logfile= and /LogToConsole=false
@@ -12,7 +12,7 @@ description: >
   with common evasion flags and unusual file locations.
 
 pattern: |
-  (?i)installutil(?:\.exe)?[\s\r\n]+(?:[^\r\n]*?(?:/U|/uninstall|/logfile=|/LogToConsole=false|/logtoconsole=false)[\s\r\n]+)?[^\r\n]*?(?:C:\\(?:Windows\\Temp|Temp|Users\\[^\\]+\\AppData\\(?:Local\\)?(?:Temp)?|Users\\Public|ProgramData)|/tmp|/var/tmp)[^\r\n]*?\.(?:exe|dll)
+  (?i)installutil.*(temp|appdata|public|programdata).*\.(exe|dll)
 
 malicious:
   - "InstallUtil.exe C:\\Temp\\malware.exe"

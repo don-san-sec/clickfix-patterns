@@ -1,10 +1,10 @@
-name: experimental-high-15-rundll32
-severity: high-experimental
+name: high-11-rundll32
+severity: high
 description: >
   Detects rundll32 executing DLLs downloaded from remote URLs. Living-off-the-land technique for stealthy execution.
 
 pattern: |
-  (?i)rundll32(?:\.exe)?[\s\r\n,]+(?:javascript:|vbscript:|about:|http://|https://|ftp://|[^\r\n]*?(?:C:\\(?:Windows\\Temp|Temp|Users\\[^\\]+\\AppData|Users\\Public|ProgramData)|/tmp)[^\r\n]*?\.dll)|(?:[^\r\n]*?\.dll[,\s]+(?:Execute|EntryPoint|Run|Start|Main|DllMain|DllRegisterServer|Loader|Init|Launch))
+  (?i)rundll32.*(javascript:|vbscript:|about:|(https?|ftp)://|(temp|appdata|public|programdata|/tmp).*\.dll.*(execute|entrypoint|run|start|main|dllmain|dllregisterserver|loader|init|launch))
 
 malicious:
   - 'rundll32.exe javascript:"\..\mshtml,RunHTMLApplication ";document.write();eval("malicious")'

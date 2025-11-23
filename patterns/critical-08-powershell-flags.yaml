@@ -1,10 +1,10 @@
-name: high-06-powershell-flags
-severity: high
+name: critical-08-powershell-flags
+severity: critical
 description: >
   Detects PowerShell with suspicious flag combinations like hidden windows and bypassed execution policy.
 
 pattern: |
-  (?i)powershell.*-(w|windowstyle)\s+(hidden|h)|powershell.*(-(w|windowstyle)\s+(hidden|h)).*(-(ep|executionpolicy)\s+(bypass|unrestricted))|(-(ep|executionpolicy)\s+(bypass|unrestricted)).*(-(w|windowstyle)\s+(hidden|h))
+  (?i)powershell.*-w(indowstyle)?\s+h(idden)?|-w(indowstyle)?\s+h(idden)?.*-e(p|xecutionpolicy)?\s+(bypass|unrestricted)|-e(p|xecutionpolicy)?\s+(bypass|unrestricted).*-w(indowstyle)?\s+h(idden)?
 
 malicious:
   - 'powershell -w hidden -c "malicious code"'

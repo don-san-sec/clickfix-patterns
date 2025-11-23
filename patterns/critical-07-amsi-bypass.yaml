@@ -1,10 +1,10 @@
-name: critical-18-amsi-bypass
+name: critical-07-amsi-bypass
 severity: critical
 description: >
   Detects AMSI bypass attempts. Critical indicator of evasion techniques.
 
 pattern: |
-  (?i)(AmsiUtils|amsiInitFailed|amsiContext).*(SetValue|bypass|NonPublic|=\s*\$true)|Ref.*Assembly.*GetType.*AmsiUtils
+  (?i)(amsiutils|amsiinitfailed|amsicontext).*(setvalue|bypass|nonpublic|=\s*\$true)|ref.*assembly.*gettype.*amsi
 
 malicious:
   - "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)"

