@@ -298,11 +298,12 @@
 
             .regex-container {
                 position: relative;
+                margin-bottom: 0.75rem;
             }
 
             .pattern-regex {
                 padding: 0.75rem;
-                padding-right: 8rem;
+                padding-right: 5rem;
                 border-radius: 3px;
                 font-size: 0.8125rem;
                 overflow-x: auto;
@@ -334,6 +335,9 @@
             }
 
             .copy-btn {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
                 background: var(--text-primary);
                 border: none;
                 color: white;
@@ -353,41 +357,6 @@
 
             .copy-btn.copied {
                 background: #28a745;
-            }
-
-            .regex-actions {
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
-                display: flex;
-                gap: 0.5rem;
-                align-items: center;
-            }
-
-            .regex101-link {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.25rem;
-                padding: 0.25rem 0.75rem;
-                background: #f0f0f0;
-                border: 1px solid var(--border);
-                border-radius: 3px;
-                color: var(--text-primary);
-                text-decoration: none;
-                font-size: 0.6875rem;
-                font-weight: 500;
-                text-transform: uppercase;
-                letter-spacing: 0.3px;
-                transition: all 0.2s;
-            }
-
-            .regex101-link:hover {
-                background: #e0e0e0;
-            }
-
-            .regex101-link svg {
-                width: 10px;
-                height: 10px;
             }
 
             footer {
@@ -487,23 +456,13 @@
 
                         {% if pattern.regex %}
                         <div class="regex-container">
-                            <div class="regex-actions">
-                                <a
-                                    href="https://regex101.com/?regex={{ pattern.regex|urlencode }}&flags=gmi"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="regex101-link"
-                                >
-                                    Test
-                                </a>
-                                <button
-                                    class="copy-btn"
-                                    onclick="copyToClipboard(this)"
-                                    data-regex="{{ pattern.regex|e }}"
-                                >
-                                    Copy
-                                </button>
-                            </div>
+                            <button
+                                class="copy-btn"
+                                onclick="copyToClipboard(this)"
+                                data-regex="{{ pattern.regex|e }}"
+                            >
+                                Copy
+                            </button>
                             <pre><code class="language-regex">{{ pattern.regex }}</code></pre>
                         </div>
                         {% endif %} {% if pattern.malicious_examples %}
