@@ -15,7 +15,7 @@ make test-all   # Run all tests including experimental patterns
 
 ## Documentation
 
-View the **[Pattern Documentation](https://dsepashvili.github.io/clickfix/)** on GitHub Pages for complete pattern details with descriptions, regex patterns, and severity levels. Auto-updated on every commit.
+View the **[Pattern Documentation](https://don-san-sec.github.io/clickfix-patterns/)** on GitHub Pages for complete pattern details with descriptions, regex patterns, and severity levels. Auto-updated on every commit.
 
 ## Structure
 

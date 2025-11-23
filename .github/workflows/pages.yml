@@ -5,9 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'patterns/**'
-      - 'scripts/generate_docs.py'
-      - '.github/workflows/pages.yml'
+      - "patterns/**"
+      - "scripts/generate_docs.py"
+      - "scripts/template.html"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -29,11 +30,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          pip install pyyaml
+          pip install pyyaml jinja2
 
       - name: Generate documentation
         run: |
@@ -45,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs'
+          path: "./docs"
 
   deploy:
     environment:
