@@ -31,4 +31,4 @@ patterns/test_report.txt
 .cache/
 
 # Generated documentation
-docs/
+/docs/
