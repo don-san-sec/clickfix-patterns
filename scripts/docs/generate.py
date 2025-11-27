@@ -86,7 +86,7 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
     for severity_key, severity_label, severity_badge in severity_configs:
         patterns = []
         for yaml_file, data in patterns_by_severity[severity_key]:
-            regex_pattern = data["pattern"]
+            regex_pattern = data["pattern"].strip()
             js_regex_pattern = clean_regex_for_javascript(regex_pattern)
             patterns.append(
                 {
