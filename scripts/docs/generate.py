@@ -93,7 +93,7 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
                     "id": generate_pattern_id(data["name"]),
                     "name": data["name"],
                     "display_name": format_pattern_name(data["name"]),
-                    "description": data["description"],
+                    "description": data["description"].strip(),
                     "intent": get_detection_intent(data["name"], data["description"]),
                     "regex": regex_pattern,
                     "js_regex": js_regex_pattern,

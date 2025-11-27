@@ -844,7 +844,7 @@
                     id: "{{ pattern.id }}",
                     name: "{{ pattern.display_name }}",
                     severity: "{{ severity_key }}",
-                    description: "{{ pattern.description | replace('"', '\\"') }}",
+                    description: {{ pattern.description | tojson }},
                     pattern: {{ pattern.regex | tojson }},
                     regex: new RegExp({{ pattern.js_regex | tojson }}, 'is')
                 },
