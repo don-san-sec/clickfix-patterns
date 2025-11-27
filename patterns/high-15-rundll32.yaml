@@ -4,7 +4,7 @@ description: >
   Detects rundll32 executing DLLs downloaded from remote URLs. Living-off-the-land technique for stealthy execution.
 
 pattern: |
-  (?i)rundll32.*(javascript:|vbscript:|about:|(https?|ftp)://|(temp|appdata|public|programdata|/tmp).*\.dll.*(execute|entrypoint|run|start|main|dllmain|dllregisterserver|loader|init|launch))
+  (?i)(rundll32.*(javascript:|vbscript:|about:|(https?|ftp)://|(temp|appdata|public|programdata|/tmp).*\.dll.*(execute|entrypoint|run|start|main|dllmain|dllregisterserver|loader|init|launch)))
 
 malicious:
   - 'rundll32.exe javascript:"\..\mshtml,RunHTMLApplication ";document.write();eval("malicious")'

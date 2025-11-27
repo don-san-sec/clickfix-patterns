@@ -5,7 +5,7 @@ description: >
   Makes clipboard content appear as a legitimate file path in File Explorer's address bar.
 
 pattern: |
-  (?i)powershell.*#\s*[A-Za-z]:\\.+\.(docx?|xlsx?|pptx?|pdf|zip|exe)
+  (?i)(powershell.*#\s*[A-Za-z]:\\.+\.(docx?|xlsx?|pptx?|pdf|zip|exe))
 
 malicious:
   - "Powershell.exe -c ping attacker.example            # C:\\company\\internal\\shared\\file.docx"

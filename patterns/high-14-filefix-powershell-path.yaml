@@ -4,7 +4,7 @@ description: >
   Detects PowerShell scripts in suspicious temp locations. Common malware staging area.
 
 pattern: |
-  (?i)powershell.*([Tt]emp|AppData|Users.{0,2}Public|ProgramData|/tmp|/var/tmp).*\.ps1
+  (?i)(powershell.*([Tt]emp|AppData|Users.{0,2}Public|ProgramData|/tmp|/var/tmp).*\.ps1)
 
 malicious:
   - "powershell -File C:\\Windows\\Temp\\malicious.ps1"

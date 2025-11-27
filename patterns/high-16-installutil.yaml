@@ -5,7 +5,7 @@ description: >
   Focuses on assemblies loaded from suspicious temp locations with common evasion flags.
 
 pattern: |
-  (?i)installutil.*(temp|appdata|public|programdata).*\.(exe|dll)
+  (?i)(installutil.*(temp|appdata|public|programdata).*\.(exe|dll))
 
 malicious:
   - "InstallUtil.exe C:\\Temp\\malware.exe"

