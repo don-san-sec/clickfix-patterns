@@ -8,14 +8,6 @@
 
 ---
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Development](#development)
-- [License](#license)
-
----
-
 ## Overview
 
 ### What is ClickFix?
@@ -61,9 +53,3 @@ Each YAML pattern contains:
 - **pattern** - Regex pattern(s)
 - **malicious** - Test cases that should match
 - **benign** - Test cases that should not match
-
----
-
-## License
-
-MIT License - See [LICENSE](LICENSE) for details.
