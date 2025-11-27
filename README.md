@@ -31,8 +31,8 @@ make docs       # Generate documentation
 **Testing specific patterns:**
 
 ```bash
-./scripts/run_tests.py critical-01-base64-powershell   # Test single pattern
-./scripts/run_tests.py                                  # Test all patterns
+./scripts/test/run.py critical-01-base64-powershell   # Test single pattern
+./scripts/test/run.py                                 # Test all patterns
 ```
 
 **Pattern structure:**
