@@ -6,8 +6,8 @@ import urllib.parse
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+import yaml
 from jinja2 import Environment, FileSystemLoader
-from yaml_parser import parse_yaml_pattern
 
 
 def get_detection_intent(name: str, description: str) -> str:
@@ -61,7 +61,7 @@ def load_patterns(patterns_dir: Path) -> Dict[str, List[Tuple]]:
     }
 
     for yaml_file in sorted(patterns_dir.glob("*.yaml")):
-        pattern_data = parse_yaml_pattern(yaml_file)
+        pattern_data = yaml.safe_load(yaml_file.read_text())
         severity = pattern_data["severity"]
         if severity in patterns_by_severity:
             patterns_by_severity[severity].append((yaml_file, pattern_data))
@@ -119,11 +119,11 @@ def prepare_template_data(patterns_by_severity: Dict[str, List[Tuple]]) -> Dict:
 
 
 def generate_html_documentation(output_dir: Path):
-    patterns_dir = Path(__file__).parent.parent / "patterns"
-    scripts_dir = Path(__file__).parent
+    patterns_dir = Path("patterns")
+    template_dir = Path("scripts/docs")
     patterns_by_severity = load_patterns(patterns_dir)
     template_data = prepare_template_data(patterns_by_severity)
-    env = Environment(loader=FileSystemLoader(scripts_dir))
+    env = Environment(loader=FileSystemLoader(template_dir))
     env.filters["urlencode"] = lambda s: urllib.parse.quote(s, safe="")
     template = env.get_template("template.html")
     html = template.render(**template_data)
@@ -133,9 +133,9 @@ def generate_html_documentation(output_dir: Path):
 
 
 def main():
-    output_dir = Path(__file__).parent.parent / "docs"
+    output_dir = Path("docs")
 
-    print(f"Generating HTML pattern documentation...")
+    print("Generating HTML pattern documentation...")
     generate_html_documentation(output_dir)
     nojekyll_file = output_dir / ".nojekyll"
     nojekyll_file.touch()
