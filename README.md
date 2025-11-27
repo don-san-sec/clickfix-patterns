@@ -1,12 +1,6 @@
-# ClickFix Pattern Library
+# [ClickFix Pattern Library](https://don-san-sec.github.io/clickfix-patterns/)
 
-> Library of regex patterns for detecting ClickFix social engineering attacks, designed to be applied to clipboard contents.
-
-![ClickFix Pattern Library](.github/media/banner.png)
-
-🔗 **[Live Documentation & Pattern Tester](https://don-san-sec.github.io/clickfix-patterns/)**
-
----
+Library of regex patterns for detecting ClickFix social engineering attacks, designed to be applied to clipboard contents.
 
 ## Overview
 
@@ -18,7 +12,7 @@ ClickFix is a social engineering technique that tricks users into copying and ex
 
 This library provides regex patterns organized by severity level that can be applied to clipboard contents to detect potential ClickFix attacks. Meant to be used with browser extensions or other tools that can monitor clipboard contents and apply these patterns to warn users before they execute malicious commands.
 
----
+![ClickFix Pattern Library](.github/media/banner.png)
 
 ## Development
 
