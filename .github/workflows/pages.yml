@@ -6,8 +6,7 @@ on:
       - main
     paths:
       - "patterns/**"
-      - "scripts/generate_docs.py"
-      - "scripts/template.html"
+      - "scripts/docs/**"
   workflow_dispatch:
 
 permissions:
@@ -32,12 +31,10 @@ jobs:
           python-version: "3.x"
 
       - name: Install dependencies
-        run: |
-          python3 -m pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Generate documentation
-        run: |
-          python3 scripts/generate_docs.py
+        run: python3 scripts/docs/generate.py
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
