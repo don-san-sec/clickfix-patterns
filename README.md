@@ -1,19 +1,34 @@
 # ClickFix Pattern Library
 
-Regex patterns for detecting ClickFix social engineering attacks.
+> Library of regex patterns for detecting ClickFix social engineering attacks, designed to be applied to clipboard contents.
 
 ![ClickFix Pattern Library](.github/media/banner.png)
 
-## What is ClickFix?
+🔗 **[Live Documentation & Pattern Tester](https://don-san-sec.github.io/clickfix-patterns/)**
 
-ClickFix is a social engineering technique that tricks users into copying and executing malicious commands. Attackers disguise PowerShell, bash, or other scripts as "fixes" for fake errors. This library provides detection patterns to identify these attacks.
+---
 
-## Quick Links
+## Table of Contents
 
-- **[Live Documentation](https://don-san-sec.github.io/clickfix-patterns/)** - Interactive pattern browser with testing tool
-- **[GitHub Repository](https://github.com/don-san-sec/clickfix-patterns)** - Source code and patterns
+- [Overview](#overview)
+- [Development](#development)
+- [License](#license)
 
-## Quick Start
+---
+
+## Overview
+
+### What is ClickFix?
+
+ClickFix is a social engineering technique that tricks users into copying and executing malicious commands. Attackers disguise PowerShell, bash, or other scripts as "fixes" for fake errors—prompting victims to paste dangerous code into their terminal or Run dialog.
+
+### How to Use This Library
+
+This library provides regex patterns organized by severity level that can be applied to clipboard contents to detect potential ClickFix attacks. Meant to be used with browser extensions or other tools that can monitor clipboard contents and apply these patterns to warn users before they execute malicious commands.
+
+---
+
+## Development
 
 ```bash
 make setup      # Install dependencies
@@ -21,7 +36,14 @@ make test       # Run pattern tests
 make docs       # Generate documentation
 ```
 
-## Pattern Structure
+**Testing specific patterns:**
+
+```bash
+./scripts/run_tests.py critical-01-base64-powershell   # Test single pattern
+./scripts/run_tests.py                                  # Test all patterns
+```
+
+**Pattern structure:**
 
 ```
 patterns/
@@ -40,35 +62,7 @@ Each YAML pattern contains:
 - **malicious** - Test cases that should match
 - **benign** - Test cases that should not match
 
-## Interactive Tester
-
-The [live documentation](https://don-san-sec.github.io/clickfix-patterns/) includes an interactive pattern tester:
-
-1. Click **🧪 Test String** in the header
-2. Paste any command or string
-3. See which patterns match instantly
-4. Click pattern names to view details
-
-Perfect for validating patterns against real-world commands and identifying false positives.
-
-## Development
-
-```bash
-# Test specific pattern
-./scripts/run_tests.py critical-01-base64-powershell
-
-# Test all patterns
-./scripts/run_tests.py
-
-# Generate documentation
-./scripts/generate_docs.py
-```
-
-## Pattern Tiers
-
-- **Critical** - Immediate threat indicators (encoded PowerShell, hidden execution)
-- **High** - Strong malicious signals (remote downloads, script execution)
-- **Medium** - Suspicious patterns requiring context
+---
 
 ## License
 
