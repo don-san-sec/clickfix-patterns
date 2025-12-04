@@ -13,7 +13,7 @@ help:
 	@echo "  make docs  - generate documentation"
 
 $(VENV)/bin/activate:
-	python3 -m venv $(VENV)
+	/opt/homebrew/bin/python3.13 -m venv $(VENV)
 
 setup: $(VENV)/bin/activate
 	$(PIP) install -r requirements.txt
