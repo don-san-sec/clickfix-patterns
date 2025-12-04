@@ -49,7 +49,7 @@ def format_pattern_name(name: str) -> str:
 
 def extract_malicious_examples(pattern_data: Dict) -> List[str]:
     if "malicious" in pattern_data and pattern_data["malicious"]:
-        return pattern_data["malicious"][:5]
+        return pattern_data["malicious"]
     return []
 
 
